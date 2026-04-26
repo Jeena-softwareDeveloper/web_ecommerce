@@ -9,7 +9,8 @@ const CommonHeader = ({
     isSearchPage = false,
     searchValue = '',
     setSearchValue = () => {},
-    onSearch = () => {}
+    onSearch = () => {},
+    backPath = null
 }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -35,7 +36,7 @@ const CommonHeader = ({
             <div className="max-w-7xl mx-auto px-4 flex items-center gap-2 py-1.5">
                 {/* Back */}
                 <button 
-                    onClick={() => navigate(-1)}
+                    onClick={() => backPath ? navigate(backPath) : navigate(-1)}
                     className="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-lg bg-gray-50/50 border border-primary/10 text-gray-800 active:scale-95 transition-transform"
                 >
                     <ChevronLeft size={22} />

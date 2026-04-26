@@ -56,7 +56,7 @@ const Register = () => {
         <div className="h-screen relative font-sans overflow-hidden selection:bg-primary/10 selection:text-primary">
             {/* Back Button */}
             <button 
-                onClick={() => navigate(-1)}
+                onClick={() => navigate('/')}
                 className="fixed top-4 left-4 z-[60] h-10 w-10 flex items-center justify-center bg-white rounded-lg border border-gray-200 shadow-sm active:scale-95 transition-all text-secondary"
             >
                 <ArrowLeft size={20} />

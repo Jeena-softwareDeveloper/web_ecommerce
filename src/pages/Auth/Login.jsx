@@ -47,10 +47,7 @@ const Login = () => {
         <div className="h-screen relative font-sans overflow-hidden selection:bg-primary/10 selection:text-primary">
             {/* Back Button */}
             <button 
-                onClick={() => {
-                    if (window.history.length > 2) navigate(-1);
-                    else navigate('/');
-                }}
+                onClick={() => navigate('/')}
                 className="fixed top-4 left-4 z-[60] h-10 w-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100 shadow-sm active:scale-95 transition-all text-secondary hover:border-primary/20"
             >
                 <ArrowLeft size={20} />

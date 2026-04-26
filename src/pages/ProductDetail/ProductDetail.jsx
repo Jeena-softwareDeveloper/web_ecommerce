@@ -319,7 +319,7 @@ const ProductDetail = () => {
 
     return (
         <div className="min-h-screen bg-white md:bg-gray-50 pb-[60px] md:pb-0">
-            <CommonHeader title=" " />
+            <CommonHeader title=" " backPath="/" />
 
             {/* Offset for fixed header */}
             <div className="pt-[52px] md:pt-[60px]">
