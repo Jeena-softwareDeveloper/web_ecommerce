@@ -68,7 +68,7 @@ const ProductCard = ({ product }) => {
             {/* Details Container */}
             <div className="p-3 md:p-4 flex flex-col flex-grow bg-slate-50/50 border-t border-gray-300/50">
                 {/* Product Title */}
-                <h3 className="font-semibold text-secondary text-[11px] md:text-[13px] line-clamp-2 h-8 md:h-10 leading-tight mb-1 group-hover:text-primary transition-colors">
+                <h3 className="font-bold text-secondary text-[11px] md:text-[13px] line-clamp-2 h-[32px] md:h-[38px] leading-[16px] md:leading-[19px] mb-1 group-hover:text-primary transition-colors overflow-hidden">
                     {name}
                 </h3>
 

@@ -39,9 +39,9 @@ const PersonalizedSection = () => {
             </div>
 
             {/* Horizontal Scroll Area */}
-            <div className="flex overflow-x-auto no-scrollbar px-4 space-x-4 items-stretch">
+            <div className="flex overflow-x-auto no-scrollbar px-4 space-x-2 items-stretch">
                 {products.map((product) => (
-                    <div key={product._id} className="w-[165px] md:w-[210px] flex-shrink-0 transform hover:scale-[1.02] transition-transform">
+                    <div key={product._id} className="w-[calc(50%-4px)] md:w-[210px] flex-shrink-0 transform hover:scale-[1.02] transition-transform">
                         <ProductCard product={product} />
                     </div>
                 ))}

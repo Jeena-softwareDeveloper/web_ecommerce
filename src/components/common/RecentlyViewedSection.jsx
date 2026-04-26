@@ -40,9 +40,9 @@ const RecentlyViewedSection = () => {
             </div>
 
             {/* Horizontal Scroll Area */}
-            <div className="flex overflow-x-auto no-scrollbar px-3 space-x-3 md:space-x-5 pb-2 -mb-2 items-stretch">
+            <div className="flex overflow-x-auto no-scrollbar px-3 space-x-2 md:space-x-5 pb-2 -mb-2 items-stretch">
                 {recentProducts.slice(0, 10).map((product) => (
-                    <div key={product._id} className="w-[160px] md:w-[200px] flex-shrink-0">
+                    <div key={product._id} className="w-[calc(50%-4px)] md:w-[200px] flex-shrink-0">
                         <ProductCard product={{
                             ...product,
                             name: product.name || product.productName,
