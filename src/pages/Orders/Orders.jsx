@@ -95,39 +95,49 @@ const Orders = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.05 }}
                                     onClick={() => navigate(`/order-details/${order._id}`)}
-                                    className="py-6 px-2 cursor-pointer hover:bg-gray-100/50 transition-all border-b border-gray-200/60 last:border-0"
+                                    className="bg-white p-5 mb-4 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] border border-gray-100 cursor-pointer hover:border-primary/20 hover:shadow-md transition-all active:scale-[0.99] group"
                                 >
-                                    <div className="flex justify-between items-start mb-2">
+                                    <div className="flex justify-between items-start mb-4">
                                         <div>
-                                            <span className="text-[9px] font-medium text-gray-400 uppercase tracking-widest block">Order ID</span>
-                                            <h4 className="text-sm font-semibold text-secondary tracking-tight">#{order._id.slice(-8).toUpperCase()}</h4>
+                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Order ID</span>
+                                            <h4 className="text-sm font-black text-secondary tracking-tight">#{order._id.slice(-8).toUpperCase()}</h4>
                                         </div>
-                                        <div className={`px-2.5 py-1 rounded-full flex items-center gap-1 ${status.bg}`}>
+                                        <div className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm ${status.bg}`}>
                                             <span className={status.text}>{status.icon}</span>
-                                            <span className={`text-[9px] font-semibold uppercase tracking-wider ${status.text}`}>{status.label}</span>
+                                            <span className={`text-[9px] font-black uppercase tracking-wider ${status.text}`}>{status.label}</span>
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-3">
-                                        <div className="w-12 h-14 rounded-lg bg-gray-50 overflow-hidden flex-shrink-0 shadow-sm">
+                                    <div className="flex gap-4 items-center">
+                                        <div className="w-16 h-20 rounded-xl bg-gray-50 overflow-hidden flex-shrink-0 shadow-sm border border-gray-100">
                                             <img 
                                                 src={order.products[0]?.images?.[0] || order.products[0]?.image || '/placeholder.jpg'} 
                                                 alt="prod" 
-                                                className="w-full h-full object-cover"
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                             />
                                         </div>
                                         <div className="flex-1 flex flex-col justify-center min-w-0">
-                                            <h5 className="text-xs font-bold text-gray-800 truncate mb-0.5">
+                                            <h5 className="text-sm font-extrabold text-gray-900 truncate mb-1">
                                                 {firstProductName}
-                                                {order.products.length > 1 && <span className="text-gray-400 font-medium"> + {order.products.length - 1} more</span>}
+                                                {order.products.length > 1 && <span className="text-gray-400 font-medium text-xs"> + {order.products.length - 1} more</span>}
                                             </h5>
-                                            <p className="text-[10px] font-medium text-gray-500 truncate mb-1">
-                                                Qty: {totalQty} • {orderDate.toLocaleDateString()} at {orderDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </p>
-                                            <p className="text-sm font-black text-gray-900 tracking-tight">₹{order.price}</p>
+                                            <div className="flex flex-col space-y-0.5">
+                                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">
+                                                    Quantity: {totalQty} items
+                                                </p>
+                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
+                                                    Ordered: {orderDate.toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                            <div className="mt-2 flex items-center gap-2">
+                                                <span className="text-[10px] text-gray-300 font-bold tracking-widest uppercase">Total</span>
+                                                <p className="text-base font-black text-primary tracking-tight">₹{order.price}</p>
+                                            </div>
                                         </div>
                                         <div className="flex items-center">
-                                            <ChevronRight size={18} className="text-gray-300" />
+                                            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100 group-hover:bg-primary/5 group-hover:border-primary/10 transition-colors">
+                                                <ChevronRight size={16} className="text-gray-300 group-hover:text-primary transition-all group-hover:translate-x-0.5" />
+                                            </div>
                                         </div>
                                     </div>
                                 </motion.div>
