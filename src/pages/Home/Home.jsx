@@ -96,13 +96,20 @@ const Home = () => {
     // Infinite Scroll Logic
     useEffect(() => {
         const handleInfiniteScroll = () => {
+            // Safety: If we've already loaded all products, don't even run the logic
+            if (products.length >= totalProducts && totalProducts > 0) return;
+
             if (window.innerHeight + document.documentElement.scrollTop + 150 >= document.documentElement.offsetHeight) {
-                if (!isFetching && !prodLoader && !loadError && products.length < totalProducts && totalProducts > 0) {
+                if (!isFetching && !prodLoader && !loadError && products.length < totalProducts) {
                     setFilterState(prev => ({ ...prev, page: prev.page + 1 }));
                 }
             }
         };
-        window.addEventListener('scroll', handleInfiniteScroll);
+
+        if (products.length < totalProducts || totalProducts === 0) {
+            window.addEventListener('scroll', handleInfiniteScroll);
+        }
+        
         return () => window.removeEventListener('scroll', handleInfiniteScroll);
     }, [isFetching, prodLoader, loadError, products.length, totalProducts]);
 
