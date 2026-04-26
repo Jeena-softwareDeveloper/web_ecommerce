@@ -95,12 +95,6 @@ const Orders = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.05 }}
                                     onClick={() => navigate(`/order-details/${order._id}`)}
-                                <motion.div 
-                                    key={order._id}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.05 }}
-                                    onClick={() => navigate(`/order-details/${order._id}`)}
                                     className="bg-white px-3 py-4 cursor-pointer border-b border-gray-300 hover:bg-gray-50/50 transition-all active:scale-[0.99] group first:rounded-t-2xl last:rounded-b-2xl last:border-b-0"
                                 >
                                     <div className="flex gap-4 items-center">
