@@ -537,11 +537,8 @@ const Checkout = () => {
                                 /* STEP 2: PAYMENT METHOD */
                                 <motion.div key="payment" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
                                     
-                                    <div className="px-4 py-3 md:pt-0">
-                                        <button className="flex items-center text-gray-400 font-bold text-xs uppercase tracking-widest mb-4 hover:text-[#e11955]" onClick={() => setStep(1)}>
-                                            <ChevronLeft size={16} className="mr-1" /> Back to Address
-                                        </button>
-                                        <p className="text-gray-600 font-bold text-xs mb-2">Select payment method</p>
+                                    <div className="px-4 py-4 bg-white border-b border-gray-100">
+                                        <p className="text-gray-900 font-bold text-sm uppercase tracking-tight">Select Payment Method</p>
                                     </div>
 
                                     {/* Hand-coded Options tracking accurately mobile design */}
