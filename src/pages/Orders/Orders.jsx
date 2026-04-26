@@ -95,47 +95,53 @@ const Orders = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.05 }}
                                     onClick={() => navigate(`/order-details/${order._id}`)}
-                                    className="bg-white px-3 py-6 cursor-pointer border-b border-gray-300 hover:bg-gray-50/50 transition-all active:scale-[0.99] group first:rounded-t-2xl last:rounded-b-2xl last:border-b-0"
+                                <motion.div 
+                                    key={order._id}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    onClick={() => navigate(`/order-details/${order._id}`)}
+                                    className="bg-white px-3 py-4 cursor-pointer border-b border-gray-300 hover:bg-gray-50/50 transition-all active:scale-[0.99] group first:rounded-t-2xl last:rounded-b-2xl last:border-b-0"
                                 >
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div>
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block mb-0.5">Order ID</span>
-                                            <h4 className="text-sm font-bold text-secondary tracking-tight">#{order._id.slice(-8).toUpperCase()}</h4>
-                                        </div>
-                                        <div className={`px-2.5 py-1 rounded-lg flex items-center gap-1.5 ${status.bg}`}>
-                                            <span className={status.text}>{status.icon}</span>
-                                            <span className={`text-[9px] font-bold uppercase tracking-wider ${status.text}`}>{status.label}</span>
-                                        </div>
-                                    </div>
-
                                     <div className="flex gap-4 items-center">
-                                        <div className="w-16 h-20 rounded-xl bg-gray-50 overflow-hidden flex-shrink-0 border border-gray-100">
+                                        <div className="w-14 h-16 rounded-lg bg-gray-50 overflow-hidden flex-shrink-0 border border-gray-100 shadow-sm">
                                             <img 
                                                 src={order.products[0]?.images?.[0] || order.products[0]?.image || '/placeholder.jpg'} 
                                                 alt="prod" 
                                                 className="w-full h-full object-cover"
                                             />
                                         </div>
-                                        <div className="flex-1 flex flex-col justify-center min-w-0">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-0.5">Order ID</span>
+                                                    <h4 className="text-xs font-bold text-secondary tracking-tight">#{order._id.slice(-8).toUpperCase()}</h4>
+                                                </div>
+                                                <div className={`px-2 py-0.5 rounded-md flex items-center gap-1 ${status.bg}`}>
+                                                    <span className={status.text}>{status.icon}</span>
+                                                    <span className={`text-[8px] font-bold uppercase tracking-wider ${status.text}`}>{status.label}</span>
+                                                </div>
+                                            </div>
+
                                             <h5 className="text-sm font-bold text-gray-900 truncate mb-1">
                                                 {firstProductName}
                                                 {order.products.length > 1 && <span className="text-gray-400 font-medium text-xs"> + {order.products.length - 1} more</span>}
                                             </h5>
-                                            <div className="flex flex-col space-y-0.5">
-                                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">
-                                                    Quantity: {totalQty} items
-                                                </p>
-                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
-                                                    Ordered: {orderDate.toLocaleDateString()}
-                                                </p>
-                                            </div>
-                                            <div className="mt-2 flex items-center gap-2">
-                                                <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Total</span>
-                                                <p className="text-sm font-bold text-primary tracking-tight">₹{order.price}</p>
+                                            
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
+                                                        Qty: {totalQty}
+                                                    </p>
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
+                                                        {orderDate.toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                                <p className="text-sm font-black text-primary tracking-tight">₹{order.price}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center">
-                                            <ChevronRight size={18} className="text-gray-300 group-hover:text-primary transition-all group-hover:translate-x-0.5" />
+                                            <ChevronRight size={16} className="text-gray-300 group-hover:text-primary transition-all group-hover:translate-x-0.5" />
                                         </div>
                                     </div>
                                 </motion.div>
