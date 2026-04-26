@@ -169,11 +169,11 @@ const Home = () => {
                     <div className="h-[1px] flex-1 bg-gray-100 ml-4"></div>
                 </div>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 lg:gap-5">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 lg:gap-5 min-h-[400px]">
                     {/* Initial Loading */}
                     {prodLoader && filterState.page === 1 ? (
                         [1,2,3,4,5,6,7,8].map(i => (
-                            <div key={i} className="aspect-[3/4] bg-gray-100 animate-pulse rounded-xl"></div>
+                            <div key={i} className="aspect-[3/4] bg-white animate-pulse rounded-xl border border-gray-100"></div>
                         ))
                     ) : (
                         products.map((product) => (
