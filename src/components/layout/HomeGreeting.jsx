@@ -60,7 +60,7 @@ const HomeGreeting = () => {
         : 'Select delivery address';
 
     return (
-        <div className="bg-gradient-to-r from-rose-50/60 via-emerald-50/40 to-blue-50/60 pt-3 pb-2 relative overflow-hidden md:py-0 border-b border-gray-100/20">
+        <div className="bg-gradient-to-b from-primary/5 via-white to-white pt-3 pb-2 relative overflow-hidden md:py-0 border-b border-gray-100/10">
             <div className="px-3 md:px-4 flex flex-col space-y-3 md:space-y-0">
                 {/* Row 1: Brand Cards & Location (Flipkart Style) */}
                 <div className="flex items-center justify-between">
