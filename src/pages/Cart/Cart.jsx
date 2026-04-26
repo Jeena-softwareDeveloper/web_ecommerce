@@ -246,7 +246,7 @@ const Cart = () => {
             </div>
 
             {/* SCROLLABLE CONTENT AREA */}
-            <div className="flex-1 overflow-y-auto no-scrollbar pb-32 px-2 md:px-0">
+            <div className="flex-1 overflow-y-auto no-scrollbar pb-32 w-full">
 
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20">
@@ -275,29 +275,29 @@ const Cart = () => {
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.95 }}
                                             key={item._id} 
-                                            className={`bg-white md:rounded-2xl md:border md:border-gray-100 md:shadow-sm ${isOutOfStock ? 'opacity-80' : ''} ${isUpdatingThis ? 'pointer-events-none opacity-50 relative' : ''}`}
+                                            className={`bg-white border-b border-gray-300 md:rounded-2xl md:border md:border-gray-100 md:shadow-sm ${isOutOfStock ? 'opacity-80' : ''} ${isUpdatingThis ? 'pointer-events-none opacity-50 relative' : ''}`}
                                         >
                                             <div
-                                                className="w-full text-left p-4 flex cursor-pointer"
+                                                className="w-full text-left p-3 flex cursor-pointer"
                                                 onClick={() => openEditModal(item)}
                                             >
                                                 {/* Left Image */}
                                                 <div className="relative flex-shrink-0">
                                                     <img 
                                                         src={resolveImageUrl(product.images?.[0] || product.image)} 
-                                                        className="w-20 h-24 rounded bg-gray-50 object-cover" 
+                                                        className="w-20 h-24 rounded-lg bg-gray-50 object-cover border border-gray-100 shadow-sm" 
                                                         alt="" 
                                                     />
                                                     {isOutOfStock && (
-                                                        <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded">
+                                                        <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded-lg">
                                                             <div className="bg-red-600 px-1 py-0.5 rounded">
-                                                                <span className="text-[8px] text-white font-black italic">OUT OF STOCK</span>
+                                                                <span className="text-[8px] text-white font-bold italic">OUT OF STOCK</span>
                                                             </div>
                                                         </div>
                                                     )}
                                                 </div>
                                                 {/* Right Details */}
-                                                <div className="flex-1 ml-4 pr-6 flex flex-col justify-between relative">
+                                                <div className="flex-1 ml-4 pr-6 flex flex-col relative">
                                                     {/* Remove Button (Top Right Red Circle) */}
                                                     <button 
                                                         onClick={(e) => { 
@@ -310,40 +310,38 @@ const Cart = () => {
                                                     </button>
 
                                                     <div>
-                                                        <p className={`font-medium text-[11px] uppercase leading-tight mb-1 line-clamp-2 ${isOutOfStock ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                        <p className={`font-bold text-[11px] uppercase leading-tight mb-1 line-clamp-2 ${isOutOfStock ? 'text-gray-400' : 'text-gray-700'}`}>
                                                             {product.productName}
                                                         </p>
-                                                        <div className="flex items-center justify-between mb-1">
-                                                            <div className="flex items-center">
-                                                                <span className={`font-semibold text-[15px] ${isOutOfStock ? 'text-gray-400' : 'text-gray-900'}`}>₹{tieredPrice}</span>
-                                                                <span className="text-[11px] text-gray-400 line-through ml-2">₹{mrp}</span>
-                                                            </div>
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <span className={`font-bold text-[15px] ${isOutOfStock ? 'text-gray-400' : 'text-gray-900'}`}>₹{tieredPrice}</span>
+                                                            <span className="text-[11px] text-gray-400 line-through">₹{mrp}</span>
                                                             {itemSavings > 0 && !isOutOfStock && (
-                                                                <div className="bg-rose-50 px-2 py-0.5 rounded border border-rose-100">
-                                                                    <span className="text-[9px] text-[#e11955] font-semibold uppercase tracking-tighter">Save ₹{itemSavings}</span>
+                                                                <div className="bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 ml-auto">
+                                                                    <span className="text-[9px] text-[#e11955] font-bold uppercase tracking-tighter">Save ₹{itemSavings}</span>
                                                                 </div>
                                                             )}
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex flex-wrap items-center mt-2 gap-2">
-                                                        <div className="flex items-center bg-gray-50 border border-gray-100 px-2 py-1 rounded-md">
-                                                            <span className="text-[10px] text-gray-700 font-medium">Size: {item.size || 'Free'}</span>
-                                                            <ChevronRight size={12} className="text-gray-400 ml-1" />
+                                                    <div className="flex flex-wrap items-center mt-auto gap-2">
+                                                        <div className="flex items-center bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
+                                                            <span className="text-[9px] text-gray-700 font-bold uppercase">Size: {item.size || 'Free'}</span>
+                                                            <ChevronRight size={10} className="text-gray-400 ml-1" />
                                                         </div>
-                                                        <div className="flex items-center bg-gray-50 border border-gray-100 px-2 py-1 rounded-md">
-                                                            <span className="text-[10px] text-gray-700 font-medium">Qty: {item.quantity}</span>
-                                                            <ChevronRight size={12} className="text-gray-400 ml-1" />
+                                                        <div className="flex items-center bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
+                                                            <span className="text-[9px] text-gray-700 font-bold uppercase">Qty: {item.quantity}</span>
+                                                            <ChevronRight size={10} className="text-gray-400 ml-1" />
                                                         </div>
                                                         {isOutOfStock ? (
-                                                            <div className="flex items-center bg-red-100 px-2.5 py-1 rounded-lg">
+                                                            <div className="flex items-center bg-red-50 border border-red-100 px-2 py-1 rounded-lg">
                                                                 <AlertCircle size={10} className="text-red-600" />
-                                                                <span className="text-[9px] text-red-600 font-black uppercase ml-1">Sold Out / Low</span>
+                                                                <span className="text-[9px] text-red-600 font-bold uppercase ml-1">Sold Out</span>
                                                             </div>
                                                         ) : (
-                                                            <div className="flex items-center bg-rose-50/50 border border-red-100/50 px-2.5 py-1 rounded-lg">
+                                                            <div className="flex items-center bg-rose-50/50 border border-red-100/50 px-2 py-1 rounded-lg">
                                                                 <ShieldCheck size={10} className="text-[#e11955]" />
-                                                                <span className="text-[9px] text-[#e11955] font-black ml-1 uppercase">Direct from Supplier</span>
+                                                                <span className="text-[9px] text-[#e11955] font-bold ml-1 uppercase">Supplier</span>
                                                             </div>
                                                         )}
                                                     </div>
