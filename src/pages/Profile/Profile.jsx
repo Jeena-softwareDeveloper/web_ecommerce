@@ -270,7 +270,7 @@ const Profile = () => {
                     dispatch(get_supplier_status());
                     config.action();
                 }}
-                className={`${config.bg} w-full px-4 py-5 mb-6 flex items-center justify-between group relative overflow-hidden transition-all active:scale-[0.98] shadow-md border-y border-black/10 rounded-xl`}
+                className={`${config.bg} w-full px-6 py-6 mb-6 flex items-center justify-between group relative overflow-hidden transition-all active:scale-[0.99] shadow-md border-y border-black/10`}
             >
                 {vendorLoader && (
                     <div className="absolute inset-0 bg-white/10 animate-pulse z-0" />
