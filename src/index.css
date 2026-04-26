@@ -18,6 +18,10 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   html, body {
     @apply min-h-screen overflow-x-hidden;
     text-rendering: optimizeLegibility;
