@@ -80,7 +80,7 @@ const SupplierOrders = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white flex flex-col font-sans max-w-md mx-auto border-x border-gray-100 pb-20 overflow-x-hidden">
+        <>
             {/* HEADER */}
             <div className="px-5 py-4 bg-white flex items-center justify-between border-b border-gray-100 sticky top-0 z-50">
                 <div className="flex items-center">
@@ -208,7 +208,7 @@ const SupplierOrders = () => {
             </div>
 
             <SupplierFooter />
-        </div>
+        </>
     );
 };
 

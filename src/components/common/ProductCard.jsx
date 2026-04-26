@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Star, ShoppingCart, Heart } from 'lucide-react';
 import { add_to_cart, get_cart, messageClear } from '../../store/reducers/wearCartReducer';
@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 const ProductCard = ({ product }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const dispatch = useDispatch();
     const { userInfo } = useSelector(state => state.auth);
 
@@ -21,7 +22,14 @@ const ProductCard = ({ product }) => {
     const ratingCount = product.reviewCount || 0;
 
     const handleClick = () => {
-        navigate(`/product/${product._id}`);
+        // If we're already on a product page, keep the original 'from' list
+        const fromPath = location.state?.from || location.pathname;
+        const isCurrentlyOnProductPage = location.pathname.startsWith('/product/');
+        
+        navigate(`/product/${product._id}`, { 
+            state: { from: fromPath },
+            replace: isCurrentlyOnProductPage 
+        });
     };
 
     const handleAddToCart = (e) => {

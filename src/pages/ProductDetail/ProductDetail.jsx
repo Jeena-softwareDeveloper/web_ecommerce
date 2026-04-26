@@ -332,7 +332,7 @@ const ProductDetail = () => {
 
     return (
         <div className="min-h-screen bg-white md:bg-gray-50 pb-[60px] md:pb-0">
-            <CommonHeader title=" " backPath="/" />
+            <CommonHeader title=" " />
 
             {/* Offset for fixed header */}
             <div className="pt-[52px] md:pt-[60px]">
@@ -436,7 +436,8 @@ const ProductDetail = () => {
                                         key={p._id || i}
                                         onClick={() => { 
                                             if (!isCurrent) {
-                                                navigate(`/product/${p.slug || p._id}`, { replace: true });
+                                                const fromPath = location.state?.from || '/';
+                                                navigate(`/product/${p.slug || p._id}`, { replace: true, state: { from: fromPath } });
                                             }
                                         }}
                                         className={`relative flex-shrink-0 w-[60px] h-[75px] rounded-xl border-2 overflow-hidden bg-white transition-all

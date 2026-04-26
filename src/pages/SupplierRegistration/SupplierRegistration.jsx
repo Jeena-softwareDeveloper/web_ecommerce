@@ -295,7 +295,7 @@ const SupplierRegistration = () => {
     );
 
     return (
-        <div className="h-screen overflow-hidden bg-white flex flex-col font-sans w-full overscroll-none touch-none">
+        <div className="flex flex-col font-sans w-full h-full">
             {/* STICKY TOP SECTION: HEADER + STEPS */}
             <div className="flex-none bg-white shadow-sm z-50">
                 <div className="h-[56px] border-b border-gray-100 flex items-center justify-between px-4">

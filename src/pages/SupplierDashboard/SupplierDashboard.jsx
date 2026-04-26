@@ -96,9 +96,9 @@ const SupplierDashboard = () => {
     );
 
     return (
-        <div className="min-h-screen bg-white flex flex-col font-sans pb-20">
+        <>
             {/* FIXED TOP CONTAINER */}
-            <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+            <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm max-w-md mx-auto border-x">
                 {/* EXACT ANDROID HEADER */}
                 <div className="px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center flex-1">
@@ -168,12 +168,11 @@ const SupplierDashboard = () => {
                 </div>
             </div>
 
-            {/* SPACER for fixed header height */}
-            <div className="pt-[100px]" />
+            <div className="flex-1 overflow-y-auto no-scrollbar pt-[110px]">
 
             {supplierStatus === 'pending' && renderStatusBanner()}
 
-            <div className="p-4 bg-white flex-1">
+            <div className="p-4 bg-white">
                 {/* GRADIENT UPLOAD CARD */}
                 <GradientCard
                     title="Start Selling"
@@ -313,8 +312,9 @@ const SupplierDashboard = () => {
                     </div>
                 </DataCard>
             </div>
+            </div>
             <SupplierFooter />
-        </div>
+        </>
     );
 };
 

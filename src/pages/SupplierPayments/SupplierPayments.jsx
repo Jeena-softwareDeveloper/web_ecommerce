@@ -148,9 +148,9 @@ const SupplierPayments = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col font-sans pb-20">
+        <>
             {/* FIXED HEADER */}
-            <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+            <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm max-w-md mx-auto border-x">
                 <div className="px-5 py-4 flex items-center justify-between">
                     <div className="flex items-center flex-1">
                         <button 
@@ -199,7 +199,7 @@ const SupplierPayments = () => {
             <div className="pt-[120px]" />
 
             {/* CONTENT */}
-            <div className="p-4 flex-1">
+            <div className="p-4 flex-1 overflow-y-auto no-scrollbar">
                 {loader ? (
                     <div className="flex items-center justify-center py-20">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -333,7 +333,7 @@ const SupplierPayments = () => {
             </div>
 
             <SupplierFooter />
-        </div>
+        </>
     );
 };
 

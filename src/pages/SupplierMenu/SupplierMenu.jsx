@@ -24,13 +24,13 @@ const SupplierMenu = () => {
     const sections = navMenu.supplier || [];
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col font-sans max-w-md mx-auto border-x border-gray-100 pb-20">
+        <>
             {/* ANDROID MENU HEADER */}
             <div className="px-5 py-4 bg-white border-b border-gray-50 flex items-center h-[60px] sticky top-0 z-50">
                 <span className="text-[20px] font-black text-gray-900 leading-none">Menu</span>
             </div>
 
-            <div className="flex-1">
+            <div className="flex-1 overflow-y-auto no-scrollbar">
                 {/* PROFILE HEADER - EXACT ANDROID UI */}
                 <div className="bg-white px-5 py-6 flex items-center mb-4">
                     <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mr-4 border border-blue-100 text-[#5B21B6]">
@@ -86,7 +86,7 @@ const SupplierMenu = () => {
             </div>
 
             <SupplierFooter />
-        </div>
+        </>
     );
 };
 

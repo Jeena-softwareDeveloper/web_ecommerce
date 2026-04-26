@@ -61,7 +61,7 @@ const SupplierCatalogUpload = () => {
             isPrimary: true,
             images: [],
             primaryImageIndex: 0,
-            variants: [{ size: 'Free Size', listingPrice: '', mrp: '', stock: '', skuId: '' }],
+            variants: [{ size: 'Free Size', listingPrice: '', mrp: '', stock: '', skuId: '', priceTiers: [] }],
             highlights: {},
             description: ''
         }
@@ -150,7 +150,8 @@ const SupplierCatalogUpload = () => {
                         listingPrice: String(v.listingPrice || ''),
                         mrp: String(v.mrp || ''),
                         stock: String(v.stock || ''),
-                        skuId: v.skuId || ''
+                        skuId: v.skuId || '',
+                        priceTiers: (v.priceTiers || []).map(t => ({ minQty: String(t.minQty || ''), price: String(t.price || '') }))
                     })),
                     highlights: prod.additionalDetails || {},
                     description: prod.description || ''
@@ -368,7 +369,7 @@ const SupplierCatalogUpload = () => {
             isPrimary: false,
             images: [],
             primaryImageIndex: 0,
-            variants: primary.variants.map(v => ({ ...v, stock: '', skuId: generateSKU() })),
+            variants: primary.variants.map(v => ({ ...v, stock: '', skuId: generateSKU(), priceTiers: [] })),
             highlights: { ...primary.highlights },
             description: ''
         }]);
@@ -427,7 +428,11 @@ const SupplierCatalogUpload = () => {
                 color: prod.color,
                 listingPrice: parseFloat(v.listingPrice),
                 mrp: parseFloat(v.mrp),
-                stock: parseInt(v.stock)
+                stock: parseInt(v.stock),
+                priceTiers: (v.priceTiers || []).map(t => ({
+                    minQty: parseInt(t.minQty),
+                    price: parseFloat(t.price)
+                })).filter(t => !isNaN(t.minQty) && !isNaN(t.price))
             }))
         }));
 
@@ -450,7 +455,11 @@ const SupplierCatalogUpload = () => {
                 color: prod.color,
                 listingPrice: parseFloat(v.listingPrice),
                 mrp: parseFloat(v.mrp),
-                stock: parseInt(v.stock)
+                stock: parseInt(v.stock),
+                priceTiers: (v.priceTiers || []).map(t => ({
+                    minQty: parseInt(t.minQty),
+                    price: parseFloat(t.price)
+                })).filter(t => !isNaN(t.minQty) && !isNaN(t.price))
             }))
         }));
         dispatch(edit_catalog({
@@ -595,9 +604,9 @@ const SupplierCatalogUpload = () => {
                 <p className="text-gray-500 font-bold text-sm">Loading catalog data...</p>
             </div>
         )}
-        <div className="min-h-screen bg-white flex flex-col font-sans overflow-x-hidden">
+        <>
             {/* HEADER */}
-            <div className="fixed top-0 left-0 right-0 h-[60px] bg-white border-b border-gray-100 flex items-center justify-between px-4 z-50">
+            <div className="fixed top-0 left-0 right-0 h-[60px] bg-white border-b border-gray-100 flex items-center justify-between px-4 z-50 max-w-md mx-auto border-x">
                 <div className="flex items-center">
                     <button onClick={() => step > 1 ? setStep(step - 1) : navigate('/supplier-inventory')} className="mr-4">
                         <ChevronLeft size={26} color="black" />
@@ -807,7 +816,7 @@ const SupplierCatalogUpload = () => {
                                             <button 
                                                 onClick={() => {
                                                     const n = [...products];
-                                                    n[pIdx].variants.push({ size: '', listingPrice: '', mrp: '', stock: '', skuId: generateSKU() });
+                                                    n[pIdx].variants.push({ size: '', listingPrice: '', mrp: '', stock: '', skuId: generateSKU(), priceTiers: [] });
                                                     setProducts(n);
                                                 }}
                                                 className="flex items-center text-[#7C3AED] font-black text-[10px] uppercase gap-1"
@@ -835,7 +844,8 @@ const SupplierCatalogUpload = () => {
                                                                     listingPrice: n[pIdx].variants[0].listingPrice, 
                                                                     mrp: n[pIdx].variants[0].mrp, 
                                                                     stock: '', 
-                                                                    skuId: generateSKU() 
+                                                                    skuId: generateSKU(),
+                                                                    priceTiers: [] 
                                                                 });
                                                             }
                                                             setProducts(n);
@@ -893,7 +903,75 @@ const SupplierCatalogUpload = () => {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="flex justify-between items-center bg-gray-50/50 p-2 rounded-lg">
+
+                                                {/* QUANTITY BASED PRICE TIERS */}
+                                                <div className="mt-4 pt-4 border-t border-dashed border-gray-100">
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Database size={12} className="text-[#7C3AED]" />
+                                                            <span className="text-[10px] font-black text-gray-700 uppercase tracking-tight">Bulk Pricing (Optional)</span>
+                                                        </div>
+                                                        <button 
+                                                            onClick={() => {
+                                                                const n = [...products];
+                                                                n[pIdx].variants[vIdx].priceTiers.push({ minQty: '', price: '' });
+                                                                setProducts(n);
+                                                            }}
+                                                            className="text-[9px] font-black text-[#7C3AED] uppercase bg-[#7C3AED]/5 px-2 py-1 rounded-md"
+                                                        >
+                                                            + Add Tier
+                                                        </button>
+                                                    </div>
+
+                                                    {v.priceTiers?.length > 0 ? (
+                                                        <div className="space-y-2">
+                                                            {v.priceTiers.map((tier, tIdx) => (
+                                                                <div key={tIdx} className="flex items-center gap-2 bg-gray-50/50 p-2 rounded-xl border border-gray-50">
+                                                                    <div className="flex-1 flex items-center gap-2">
+                                                                        <span className="text-[9px] font-bold text-gray-400">If Qty ≥</span>
+                                                                        <input 
+                                                                            type="number"
+                                                                            placeholder="5"
+                                                                            value={tier.minQty}
+                                                                            onChange={(e) => {
+                                                                                const n = [...products];
+                                                                                n[pIdx].variants[vIdx].priceTiers[tIdx].minQty = e.target.value;
+                                                                                setProducts(n);
+                                                                            }}
+                                                                            className="w-12 bg-white border border-gray-200 rounded p-1 text-center font-black text-[10px] outline-none"
+                                                                        />
+                                                                        <span className="text-[9px] font-bold text-gray-400">Price: ₹</span>
+                                                                        <input 
+                                                                            type="number"
+                                                                            placeholder="450"
+                                                                            value={tier.price}
+                                                                            onChange={(e) => {
+                                                                                const n = [...products];
+                                                                                n[pIdx].variants[vIdx].priceTiers[tIdx].price = e.target.value;
+                                                                                setProducts(n);
+                                                                            }}
+                                                                            className="flex-1 bg-white border border-gray-200 rounded p-1 text-center font-black text-[10px] text-[#7C3AED] outline-none"
+                                                                        />
+                                                                    </div>
+                                                                    <button 
+                                                                        onClick={() => {
+                                                                            const n = [...products];
+                                                                            n[pIdx].variants[vIdx].priceTiers.splice(tIdx, 1);
+                                                                            setProducts(n);
+                                                                        }}
+                                                                        className="text-gray-300 hover:text-rose-400 p-1"
+                                                                    >
+                                                                        <X size={12} />
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-[9px] text-gray-400 italic">No bulk discounts added for this size.</p>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex justify-between items-center bg-gray-50/50 p-2 mt-3 rounded-lg">
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-[9px] font-black text-gray-400 uppercase">Stock:</span>
                                                         <input 
@@ -1305,7 +1383,7 @@ const SupplierCatalogUpload = () => {
                     </div>
                 </div>
             )}
-        </div>
+        </>
         </>
     );
 };

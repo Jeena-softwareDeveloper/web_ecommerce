@@ -34,7 +34,7 @@ const SupplierHub = () => {
     }, [token, supplierStatus, navigate]);
 
     return (
-        <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center min-h-[80vh]">
             <div className="flex flex-col items-center gap-4">
                 <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-primary"></div>
                 <p className="text-xs font-black uppercase tracking-widest text-[#D80032] animate-pulse">

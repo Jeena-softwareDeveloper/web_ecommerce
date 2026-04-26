@@ -252,7 +252,7 @@ const SupplierReturns = () => {
   }, [activeTab]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex flex-col h-full">
       <CommonHeader 
         title="Returns & RTO Management"
         showBackButton={true}
@@ -271,7 +271,7 @@ const SupplierReturns = () => {
         ]}
       />
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-6">
         {/* Stats Overview */}
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
