@@ -203,11 +203,11 @@ const Profile = () => {
                         className={`w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98] hover:bg-gray-50 group`}
                     >
                         <div className="flex items-center">
-                            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center mr-4 shadow-sm border border-white/50 transition-all group-hover:shadow-md`} style={{ backgroundColor: item.bgColor || '#F8FAFC' }}>
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 shadow-sm border border-white/50 transition-all group-hover:shadow-md`} style={{ backgroundColor: item.bgColor || '#F8FAFC' }}>
                                 {item.icon}
                             </div>
                             <div className="text-left">
-                                <h4 className="text-sm font-extrabold text-gray-800 tracking-tight">{item.label}</h4>
+                                <h4 className="text-sm font-bold text-gray-800 tracking-tight">{item.label}</h4>
                                 {item.subtitle && <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight mt-0.5">{item.subtitle}</p>}
                             </div>
                         </div>

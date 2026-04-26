@@ -99,12 +99,12 @@ const Orders = () => {
                                 >
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
-                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Order ID</span>
-                                            <h4 className="text-sm font-black text-secondary tracking-tight">#{order._id.slice(-8).toUpperCase()}</h4>
+                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block mb-0.5">Order ID</span>
+                                            <h4 className="text-sm font-bold text-secondary tracking-tight">#{order._id.slice(-8).toUpperCase()}</h4>
                                         </div>
-                                        <div className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm ${status.bg}`}>
+                                        <div className={`px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm ${status.bg}`}>
                                             <span className={status.text}>{status.icon}</span>
-                                            <span className={`text-[9px] font-black uppercase tracking-wider ${status.text}`}>{status.label}</span>
+                                            <span className={`text-[9px] font-bold uppercase tracking-wider ${status.text}`}>{status.label}</span>
                                         </div>
                                     </div>
 
@@ -117,7 +117,7 @@ const Orders = () => {
                                             />
                                         </div>
                                         <div className="flex-1 flex flex-col justify-center min-w-0">
-                                            <h5 className="text-sm font-extrabold text-gray-900 truncate mb-1">
+                                            <h5 className="text-sm font-bold text-gray-900 truncate mb-1">
                                                 {firstProductName}
                                                 {order.products.length > 1 && <span className="text-gray-400 font-medium text-xs"> + {order.products.length - 1} more</span>}
                                             </h5>
@@ -129,9 +129,9 @@ const Orders = () => {
                                                     Ordered: {orderDate.toLocaleDateString()}
                                                 </p>
                                             </div>
-                                            <div className="mt-2 flex items-center gap-2">
-                                                <span className="text-[10px] text-gray-300 font-bold tracking-widest uppercase">Total</span>
-                                                <p className="text-base font-black text-primary tracking-tight">₹{order.price}</p>
+                                            <div className="mt-1 flex items-center gap-2">
+                                                <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Total</span>
+                                                <p className="text-sm font-bold text-primary tracking-tight">₹{order.price}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center">
