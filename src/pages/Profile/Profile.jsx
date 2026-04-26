@@ -321,7 +321,7 @@ const Profile = () => {
 
             {/* HEADER (Color-rich & Integrated) */}
             <div className="pt-[48px] md:pt-[60px]">
-                <div className="pb-8 px-4 pt-2 relative overflow-hidden">
+                <div className="pb-4 px-4 pt-2 relative overflow-hidden">
                     {/* Subtle Glow Effect */}
                     <div className="absolute top-0 left-0 w-48 h-48 bg-primary/5 blur-[80px] rounded-full -translate-x-1/2 -translate-y-1/2" />
                     
@@ -364,7 +364,7 @@ const Profile = () => {
                 </div>
 
                 {/* QUICK STATS ROW */}
-                <div className="flex px-4 space-x-3 mt-4 mb-6 relative z-10 w-full">
+                <div className="flex px-4 space-x-3 mt-2 mb-6 relative z-10 w-full">
                     {[
                         { label: 'My Orders', icon: <Package size={20} className="text-indigo-500" />, iconBg: 'bg-indigo-50', onPress: () => navigate('/orders') },
                         { label: 'Support', icon: <Headphones size={20} className="text-teal-500" />, iconBg: 'bg-teal-50', onPress: () => navigate('/support') }
