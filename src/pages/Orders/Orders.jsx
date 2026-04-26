@@ -60,7 +60,7 @@ const Orders = () => {
         <div className="min-h-screen bg-gray-50 flex flex-col pt-[52px] md:pt-[90px]">
             <CommonHeader title="My Orders" />
 
-            <div className="px-4 py-6 max-w-2xl mx-auto w-full">
+            <div className="py-2 w-full">
                 {loader ? (
                     <div className="flex flex-col items-center justify-center py-20">
                         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-4"></div>
@@ -95,7 +95,7 @@ const Orders = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.05 }}
                                     onClick={() => navigate(`/order-details/${order._id}`)}
-                                    className="bg-white px-3 py-4 cursor-pointer border-b border-gray-300 hover:bg-gray-50/50 transition-all active:scale-[0.99] group first:rounded-t-2xl last:rounded-b-2xl last:border-b-0"
+                                    className="bg-white px-4 py-4 cursor-pointer border-b border-gray-300 hover:bg-gray-50/50 transition-all active:scale-[0.99] group last:border-b-0"
                                 >
                                     <div className="flex gap-4 items-center">
                                         <div className="w-14 h-16 rounded-lg bg-gray-50 overflow-hidden flex-shrink-0 border border-gray-100 shadow-sm">
