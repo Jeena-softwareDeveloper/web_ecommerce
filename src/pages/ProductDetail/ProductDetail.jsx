@@ -419,27 +419,15 @@ const ProductDetail = () => {
                                 <div className="w-[60px] h-[75px] rounded-xl border-2 border-[#e11955] overflow-hidden bg-white">
                                     <img src={images[0]} className="w-full h-full object-cover" alt="" />
                                 </div>
-                                {socialStats[product._id] > 0 && (
-                                    <div className="absolute bottom-1 right-1 bg-white/95 px-1 rounded flex items-center border border-gray-100">
-                                        <User size={7} className="text-[#e11955]" />
-                                        <span className="text-[7px] font-black text-[#e11955] ml-0.5">{socialStats[product._id]}</span>
-                                    </div>
-                                )}
                             </div>
                             {/* Other styles */}
                             {similarProducts.filter(p => p._id !== product._id).map((p, i) => (
                                 <button
                                     key={p._id || i}
-                                    onClick={() => { navigate(`/product/${p.slug || p._id}`); window.scrollTo({ top: 0 }); }}
+                                    onClick={() => { navigate(`/product/${p.slug || p._id}`, { replace: true }); }}
                                     className="relative flex-shrink-0 w-[60px] h-[75px] rounded-xl border border-gray-100 overflow-hidden bg-white"
                                 >
                                     <img src={resolveImageUrl(p.images?.[0] || p.image)} className="w-full h-full object-cover" alt="" />
-                                    {socialStats[p._id] > 0 && (
-                                        <div className="absolute bottom-1 right-1 bg-white/95 px-1 rounded flex items-center border border-gray-100">
-                                            <User size={7} className="text-gray-500" />
-                                            <span className="text-[7px] font-black text-gray-700 ml-0.5">{socialStats[p._id]}</span>
-                                        </div>
-                                    )}
                                 </button>
                             ))}
                         </div>
