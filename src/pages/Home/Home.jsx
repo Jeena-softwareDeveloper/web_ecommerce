@@ -82,7 +82,7 @@ const Home = () => {
     useEffect(() => {
         dispatch(get_wear_products({ 
             ...filterState,
-            limit: 20,
+            limit: 15,
             append: filterState.page > 1
         }));
     }, [dispatch, filterState]);
