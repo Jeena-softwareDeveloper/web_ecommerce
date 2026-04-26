@@ -20,7 +20,7 @@ const RecentlyViewedSection = () => {
     if (!userInfo || recentProducts.length === 0) return null;
 
     return (
-        <div className="py-5 bg-gradient-to-r from-sky-50/30 via-indigo-50/20 to-transparent border-y border-gray-100 mt-2">
+        <div className="py-5 bg-gradient-to-r from-blue-100/60 via-indigo-50/40 to-transparent border-y border-blue-100/20 mt-2">
             {/* Section Header */}
             <div className="px-3 flex items-center justify-between mb-4">
                 <div className="flex items-center">

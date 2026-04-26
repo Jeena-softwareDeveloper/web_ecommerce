@@ -28,7 +28,7 @@ const TopRatedSection = () => {
     if (products.length === 0) return null;
 
     return (
-        <div className="py-4 bg-gradient-to-b from-amber-50/40 via-white to-transparent border-y border-gray-100">
+        <div className="py-4 bg-gradient-to-b from-orange-100/60 via-amber-50/30 to-transparent border-y border-orange-100/20">
             {/* Section Header */}
             <div className="px-3 flex items-center justify-between mb-3">
                 <div>

@@ -24,9 +24,9 @@ const PersonalizedSection = () => {
     if (loading || products.length === 0) return null;
 
     return (
-        <div className="py-6 bg-gradient-to-br from-rose-100/40 via-purple-50/30 to-blue-50/20 border-y border-rose-100/50 my-4 shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-rose-200/20 blur-3xl rounded-full -mr-16 -mt-16 animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-200/20 blur-2xl rounded-full -ml-12 -mb-12"></div>
+        <div className="py-6 bg-gradient-to-br from-rose-200/70 via-purple-100/50 to-blue-100/40 border-y border-rose-200/50 my-4 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-rose-400/40 blur-3xl rounded-full -mr-16 -mt-16 animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-400/30 blur-2xl rounded-full -ml-12 -mb-12"></div>
             {/* Section Header */}
             <div className="px-4 flex items-center justify-between mb-5">
                 <div className="flex items-center">
