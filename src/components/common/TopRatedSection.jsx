@@ -44,9 +44,9 @@ const TopRatedSection = () => {
             </div>
 
             {/* Horizontal Scroll Area - Limit to 4 for Home Page */}
-            <div className="flex overflow-x-auto no-scrollbar px-3 space-x-2 md:space-x-5 pb-6 -mb-4 items-stretch">
+            <div className="flex overflow-x-auto no-scrollbar px-3 space-x-2 md:space-x-5 pb-6 -mb-4 items-stretch snap-x snap-mandatory">
                 {products.slice(0, 4).map((product) => (
-                    <div key={product._id} className="w-[calc(50%-4px)] md:w-[220px] lg:w-[240px] flex-shrink-0">
+                    <div key={product._id} className="w-[calc(50%-4px)] md:w-[220px] lg:w-[240px] flex-shrink-0 snap-start">
                         <ProductCard product={product} />
                     </div>
                 ))}
