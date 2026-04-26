@@ -416,7 +416,7 @@ const ProductDetail = () => {
                 <div className="md:bg-white md:rounded-2xl md:border md:border-gray-100 md:shadow-sm md:p-6 md:space-y-0">
 
                 {similarProducts && similarProducts.length > 1 && (
-                    <div className="bg-white px-4 py-2.5 border-b border-gray-100 md:border md:rounded-xl md:mb-3">
+                    <div className="bg-white px-4 py-2 border-b border-gray-100 md:border md:rounded-xl md:mb-2">
                         <div className="flex items-center justify-between mb-3">
                             <span className="text-[13px] font-bold text-gray-800">Available Styles</span>
                             {similarProducts.length > 0 && (
@@ -451,14 +451,14 @@ const ProductDetail = () => {
                 )}
 
                 {/* ===== 3. PRICE & TITLE ===== */}
-                <div className="bg-white px-4 pt-3 pb-3 md:px-0 md:pt-0">
-                    <div className="flex justify-between items-start mb-4">
+                <div className="bg-white px-4 pt-2 pb-3 md:px-0 md:pt-0">
+                    <div className="flex justify-between items-start mb-3">
                         <div className="flex-1 pr-4">
                             {/* Product name */}
                             {variationName ? (
-                                <h1 className="text-[11.5px] text-gray-800 font-medium uppercase tracking-tight leading-5">{variationName}</h1>
+                                <h1 className="text-[14px] text-gray-800 font-bold uppercase tracking-tight leading-5">{variationName}</h1>
                             ) : (
-                                <h1 className="text-[11.5px] font-medium text-gray-800 leading-tight">{fullName}</h1>
+                                <h1 className="text-[14px] font-bold text-gray-800 leading-tight">{fullName}</h1>
                             )}
 
                             {/* Price Section Redesign */}
@@ -592,46 +592,6 @@ const ProductDetail = () => {
                         <div className="w-1 h-1 rounded-full bg-gray-300"></div>
                         <TrustedBadge />
                     </div>
-
-                    {/* Volume Discounts (Desktop) */}
-                    {(() => {
-                        const tiers = currentVariant?.priceTiers || [];
-                        if (tiers.length === 0) return null;
-                        return (
-                            <div className="hidden md:block mt-4 p-4 rounded-2xl bg-indigo-50/30 border border-indigo-100/50">
-                                <div className="flex items-center gap-2 mb-3">
-                                    <div className="bg-indigo-100 p-1 rounded-lg">
-                                        <Zap size={16} className="text-indigo-600" />
-                                    </div>
-                                    <span className="text-[13px] font-bold text-gray-800 uppercase tracking-tight">Bulk Purchase Discounts</span>
-                                </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {tiers.map((tier, tIdx) => {
-                                        const isActive = selectedQty >= tier.minQty && !tiers.some(t => t.minQty > tier.minQty && selectedQty >= t.minQty);
-                                        return (
-                                            <button
-                                                key={tIdx}
-                                                onClick={() => setSelectedQty(isActive ? 1 : tier.minQty)}
-                                                className={`flex items-center justify-between p-3 rounded-xl border-2 transition-all shadow-sm ${isActive ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-indigo-50 hover:border-indigo-200'}`}
-                                            >
-                                                <div className="flex flex-col items-start">
-                                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'text-white/70' : 'text-gray-400'}`}>Order</span>
-                                                    <span className={`text-[14px] font-black ${isActive ? 'text-white' : 'text-gray-900'}`}>{tier.minQty}+ Qty</span>
-                                                </div>
-                                                <div className="flex flex-col items-end">
-                                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'text-white/70' : 'text-gray-400'}`}>Price</span>
-                                                    <span className={`text-[16px] font-black ${isActive ? 'text-white' : 'text-[#e11955]'}`}>₹{tier.price}</span>
-                                                </div>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                                <p className="text-[10px] text-gray-400 font-medium mt-3 text-center uppercase tracking-widest italic">
-                                    Select a quantity to apply the discounted price automatically
-                                </p>
-                            </div>
-                        );
-                    })()}
                 </div>
 
                 {/* Desktop action buttons — shown only on md+ IN the right column */}
@@ -1124,29 +1084,29 @@ const ProductDetail = () => {
 
             {/* ===== STICKY BOTTOM BAR (mobile only) ===== */}
             <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 shadow-2xl">
-                {/* Bulk pricing strip (Mobile) */}
+                {/* Bulk pricing strip */}
                 {(() => {
                     const tiers = currentVariant?.priceTiers || [];
                     if (tiers.length === 0) return null;
                     return (
-                        <div className="bg-indigo-50/30 px-4 py-2 border-b border-indigo-100/50">
-                            <div className="flex items-center mb-1 gap-1">
-                                <Zap size={11} className="text-indigo-600" />
-                                <span className="text-[9px] font-black text-indigo-600 uppercase tracking-wider">Volume Discounts</span>
+                        <div className="bg-indigo-50/40 px-4 py-2.5 border-b border-indigo-50">
+                            <div className="flex items-center mb-1.5 gap-1">
+                                <Zap size={12} className="text-indigo-600" />
+                                <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Volume Discounts (Tap to Apply)</span>
                             </div>
-                            <div className="flex gap-2 overflow-x-auto no-scrollbar py-0.5">
+                            <div className="flex gap-2 overflow-x-auto no-scrollbar">
                                 {tiers.map((tier, tIdx) => {
                                     const isActive = selectedQty >= tier.minQty && !tiers.some(t => t.minQty > tier.minQty && selectedQty >= t.minQty);
                                     return (
                                         <button
                                             key={tIdx}
                                             onClick={() => setSelectedQty(isActive ? 1 : tier.minQty)}
-                                            className={`border rounded-lg px-2 py-1 flex-shrink-0 flex items-center gap-1.5 shadow-sm transition-all ${isActive ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-indigo-100'}`}
+                                            className={`border rounded-lg px-3 py-1.5 flex-shrink-0 flex items-center gap-2 shadow-sm ${isActive ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-indigo-100'}`}
                                         >
-                                            <div className={`rounded px-1 py-0.5 ${isActive ? 'bg-white' : 'bg-indigo-600'}`}>
-                                                <span className={`text-[9px] font-black ${isActive ? 'text-indigo-600' : 'text-white'}`}>{tier.minQty}+</span>
+                                            <div className={`rounded px-1.5 py-0.5 ${isActive ? 'bg-white' : 'bg-indigo-600'}`}>
+                                                <span className={`text-[10px] font-black ${isActive ? 'text-indigo-600' : 'text-white'}`}>{tier.minQty}+ Qty</span>
                                             </div>
-                                            <span className={`text-[12px] font-black ${isActive ? 'text-white' : 'text-gray-900'}`}>₹{tier.price}</span>
+                                            <span className={`text-[13px] font-black ${isActive ? 'text-white' : 'text-gray-900'}`}>₹{tier.price}</span>
                                         </button>
                                     );
                                 })}
