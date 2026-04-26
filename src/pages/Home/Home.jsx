@@ -39,6 +39,7 @@ const Home = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [filterMode, setFilterMode] = useState('all');
+    const [loadError, setLoadError] = useState(false);
     const lastScrollY = useRef(0);
 
     useEffect(() => {
@@ -80,25 +81,26 @@ const Home = () => {
     }, [dispatch]);
 
     useEffect(() => {
+        setLoadError(false);
         dispatch(get_wear_products({ 
             ...filterState,
             limit: 15,
             append: filterState.page > 1
-        }));
+        })).unwrap().catch(() => setLoadError(true));
     }, [dispatch, filterState]);
 
     // Infinite Scroll Logic
     useEffect(() => {
         const handleInfiniteScroll = () => {
             if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight) {
-                if (!prodLoader && products.length < totalProducts) {
+                if (!prodLoader && !loadError && products.length < totalProducts) {
                     setFilterState(prev => ({ ...prev, page: prev.page + 1 }));
                 }
             }
         };
         window.addEventListener('scroll', handleInfiniteScroll);
         return () => window.removeEventListener('scroll', handleInfiniteScroll);
-    }, [prodLoader, products.length, totalProducts]);
+    }, [prodLoader, loadError, products.length, totalProducts]);
 
     const handleGenderCycle = () => {
         const genders = ['', 'men', 'women', 'unisex'];
@@ -184,6 +186,22 @@ const Home = () => {
                 {prodLoader && filterState.page > 1 && (
                     <div className="py-8 flex justify-center items-center">
                         <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                    </div>
+                )}
+
+                {/* Load More Fallback if Error */}
+                {loadError && (
+                    <div className="py-8 flex flex-col items-center">
+                        <p className="text-xs text-gray-500 mb-4">Something went wrong while loading more products.</p>
+                        <button 
+                            onClick={() => {
+                                setLoadError(false);
+                                setFilterState(prev => ({ ...prev, page: prev.page + 1 }));
+                            }}
+                            className="bg-white border border-gray-200 text-secondary text-xs font-bold px-6 py-2 rounded-full shadow-sm hover:bg-gray-50 uppercase tracking-wider"
+                        >
+                            Retry Load More
+                        </button>
                     </div>
                 )}
 
