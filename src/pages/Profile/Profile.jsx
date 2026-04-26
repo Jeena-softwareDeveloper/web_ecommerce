@@ -193,26 +193,33 @@ const Profile = () => {
     };
 
     const renderMenuCard = (title, items) => (
-        <div className="bg-white px-4 py-2 mb-4 border-y border-gray-100/80 shadow-sm">
-            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[4px] mb-2 mt-3 pl-1">{title}</h3>
-            {items.map((item, index) => (
-                <button
-                    key={index}
-                    onClick={item.onPress}
-                    className={`w-full flex items-center justify-between py-4 group ${index !== items.length - 1 ? 'border-b border-gray-50' : ''}`}
-                >
-                    <div className="flex items-center">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-transform group-hover:scale-110`} style={{ backgroundColor: item.bgColor || '#F8FAFC' }}>
-                            {item.icon}
+        <div className="bg-white px-2 py-2 mb-6 border-y border-gray-100 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] md:rounded-2xl md:mx-4 md:border-x">
+            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[4px] mb-2 mt-3 pl-3">{title}</h3>
+            <div className="space-y-1">
+                {items.map((item, index) => (
+                    <button
+                        key={index}
+                        onClick={item.onPress}
+                        className={`w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98] hover:bg-gray-50 group`}
+                    >
+                        <div className="flex items-center">
+                            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center mr-4 shadow-sm border border-white/50 transition-all group-hover:shadow-md`} style={{ backgroundColor: item.bgColor || '#F8FAFC' }}>
+                                {item.icon}
+                            </div>
+                            <div className="text-left">
+                                <h4 className="text-sm font-extrabold text-gray-800 tracking-tight">{item.label}</h4>
+                                {item.subtitle && <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight mt-0.5">{item.subtitle}</p>}
+                            </div>
                         </div>
-                        <div className="text-left">
-                            <h4 className="text-sm font-bold text-gray-800">{item.label}</h4>
-                            {item.subtitle && <p className="text-[10px] text-gray-400 font-medium">{item.subtitle}</p>}
+                        <div className="flex items-center">
+                            {item.rightContent}
+                            <div className="ml-3 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100 group-hover:bg-primary/5 group-hover:border-primary/10 transition-colors">
+                                <ChevronRight size={16} className="text-gray-400 group-hover:text-primary transition-colors group-hover:translate-x-0.5" />
+                            </div>
                         </div>
-                    </div>
-                    {item.rightContent ? item.rightContent : <ChevronRight size={18} className="text-gray-300 group-hover:text-gray-500 transition-colors group-hover:translate-x-1" />}
-                </button>
-            ))}
+                    </button>
+                ))}
+            </div>
         </div>
     );
 
