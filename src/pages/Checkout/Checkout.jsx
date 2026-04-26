@@ -427,7 +427,7 @@ const Checkout = () => {
             </div>
 
             {/* SCROLLABLE CONTENT AREA */}
-            <div className="flex-1 overflow-y-auto no-scrollbar pb-32 px-2 md:px-0">
+            <div className="flex-1 overflow-y-auto no-scrollbar pb-32 w-full">
 
                 <div className="grid md:grid-cols-3 gap-0 md:gap-8 items-start">
                     
@@ -438,17 +438,17 @@ const Checkout = () => {
                                 <motion.div key="address" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                                     
                                     {/* Selected Delivery Address Card */}
-                                    <div className="bg-white px-4 py-5 mb-2 md:rounded-2xl md:border md:border-gray-100 md:shadow-sm md:mb-4">
+                                    <div className="bg-white px-4 py-5 mb-2 border-b border-gray-300 md:rounded-2xl md:border md:border-gray-100 md:shadow-sm md:mb-4">
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="flex items-center">
-                                                <div className="bg-rose-50 p-2 rounded-lg text-[#9F1239]">
+                                                <div className="bg-rose-50 p-2 rounded-lg text-[#9F1239] shadow-sm border border-rose-100">
                                                     <MapPin size={18} />
                                                 </div>
-                                                <span className="text-gray-800 font-bold text-[14px] ml-3 uppercase tracking-tight">Delivery Address</span>
+                                                <span className="text-gray-900 font-bold text-[14px] ml-3 uppercase tracking-tight">Delivery Address</span>
                                             </div>
                                             <button 
                                                 onClick={() => setShowAddressModal(true)}
-                                                className="bg-rose-50 px-4 py-1.5 rounded-full border border-red-100/50"
+                                                className="bg-rose-50 px-4 py-1.5 rounded-full border border-red-100 shadow-sm"
                                             >
                                                 <span className="text-[#e11955] font-black text-[10px] uppercase tracking-widest">+ Add New</span>
                                             </button>
@@ -496,9 +496,9 @@ const Checkout = () => {
                                     </div>
 
                                     {/* Order Items Summary */}
-                                    <div className="bg-white mb-2 pb-2 md:rounded-2xl md:border md:border-gray-100 md:shadow-sm">
-                                        <div className="px-5 py-4 border-b border-gray-50">
-                                            <span className="text-[12px] font-bold uppercase text-gray-800 tracking-tighter">Items in Order</span>
+                                    <div className="bg-white mb-2 pb-2 border-b border-gray-300 md:rounded-2xl md:border md:border-gray-100 md:shadow-sm">
+                                        <div className="px-5 py-4 border-b border-gray-100">
+                                            <span className="text-[12px] font-bold uppercase text-gray-900 tracking-tighter">Items in Order</span>
                                         </div>
                                         {checkoutItems.map((item, idx) => {
                                             const product = item.productId || {};
@@ -506,19 +506,19 @@ const Checkout = () => {
                                             const originalPrice = product.variants?.[0]?.mrp || product.variants?.[0]?.listingPrice || 0;
 
                                             return (
-                                                <div key={item._id} className={`p-4 flex flex-row ${idx !== checkoutItems.length - 1 ? 'border-b border-gray-50' : ''}`}>
-                                                    <img src={resolveImageUrl(product.images?.[0])} className="w-16 h-20 rounded bg-gray-50 object-cover" alt="" />
-                                                    <div className="flex-1 ml-4 justify-between pt-1">
+                                                <div key={item._id} className={`p-3 flex flex-row ${idx !== checkoutItems.length - 1 ? 'border-b border-gray-50' : ''}`}>
+                                                    <img src={resolveImageUrl(product.images?.[0])} className="w-16 h-20 rounded-lg bg-gray-50 object-cover border border-gray-100 shadow-sm" alt="" />
+                                                    <div className="flex-1 ml-4 flex flex-col justify-between py-0.5">
                                                         <div>
-                                                            <p className="text-gray-500 font-medium text-[11px] uppercase leading-tight mb-1 line-clamp-1">{product.productName}</p>
-                                                            <div className="flex items-center mb-1">
-                                                                  <span className="font-bold text-[14px] text-gray-900">₹{displayPrice}</span>
-                                                                <span className="text-[11px] text-gray-400 line-through ml-2 font-normal">₹{originalPrice}</span>
+                                                            <p className="text-gray-700 font-bold text-[11px] uppercase leading-tight mb-1 line-clamp-2">{product.productName}</p>
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <span className="font-bold text-[15px] text-gray-900">₹{displayPrice}</span>
+                                                                <span className="text-[11px] text-gray-400 line-through font-medium">₹{originalPrice}</span>
                                                             </div>
                                                         </div>
-                                                        <div className="flex items-center space-x-2 mt-2">
-                                                            <div className="bg-gray-50 border border-gray-100 px-2 py-0.5 rounded text-[10px] text-gray-600 font-normal">Size: {item.size}</div>
-                                                            <div className="bg-gray-50 border border-gray-100 px-2 py-0.5 rounded text-[10px] text-gray-600 font-normal">Qty: {item.quantity}</div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <div className="bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-lg text-[9px] text-gray-700 font-bold uppercase">Size: {item.size}</div>
+                                                            <div className="bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-lg text-[9px] text-gray-700 font-bold uppercase">Qty: {item.quantity}</div>
                                                         </div>
                                                     </div>
                                                 </div>
