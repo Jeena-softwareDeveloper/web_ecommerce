@@ -60,7 +60,7 @@ const HomeGreeting = () => {
         : 'Select delivery address';
 
     return (
-        <div className="bg-transparent pt-3 pb-2 relative overflow-hidden md:py-0">
+        <div className="bg-gradient-to-r from-slate-50/80 via-white to-slate-50/80 pt-3 pb-2 relative overflow-hidden md:py-0">
             <div className="px-3 md:px-4 flex flex-col space-y-3 md:space-y-0">
                 {/* Row 1: Brand Cards & Location (Flipkart Style) */}
                 <div className="flex items-center justify-between">
@@ -112,7 +112,7 @@ const HomeGreeting = () => {
                                 <User size={15} className="text-blue-500 group-hover:text-blue-600 transition-colors" />
                             )}
                             <span className="ml-2 text-[12px] font-bold text-blue-900 uppercase tracking-tight">
-                                {isLoggedIn ? (profileInfo?.name?.split(' ')[0] || userInfo?.name?.split(' ')[0] || 'Me') : 'Login'}
+                                {isLoggedIn ? 'Account' : 'Login'}
                             </span>
                         </button>
                     </div>
