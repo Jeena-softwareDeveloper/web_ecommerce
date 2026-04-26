@@ -1089,8 +1089,8 @@ const ProductDetail = () => {
                     const tiers = currentVariant?.priceTiers || [];
                     if (tiers.length === 0) return null;
                     return (
-                        <div className="bg-indigo-50/40 px-4 py-2.5 border-b border-indigo-50">
-                            <div className="flex items-center mb-1.5 gap-1">
+                        <div className="bg-indigo-50/40 px-4 py-2 border-b border-indigo-50">
+                            <div className="flex items-center mb-1 gap-1">
                                 <Zap size={12} className="text-indigo-600" />
                                 <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Volume Discounts (Tap to Apply)</span>
                             </div>
