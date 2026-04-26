@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
 import logo from '../../assets/logo192.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -69,20 +68,7 @@ const HomeGreeting = () => {
                     <div className="flex items-center space-x-2.5">
                         {/* Brand Logo Card */}
                         <div className="bg-gradient-to-r from-rose-100/50 to-orange-100/50 px-3 py-1.5 rounded-lg shadow-md border border-rose-200 flex items-center group active:scale-95 transition-all">
-                            <motion.img 
-                                src={logo} 
-                                alt="Jeenora" 
-                                className="h-5 w-auto mr-2 drop-shadow-sm" 
-                                animate={{ 
-                                    scale: [1, 1.1, 1],
-                                    rotate: [0, 5, -5, 0]
-                                }}
-                                transition={{ 
-                                    duration: 4,
-                                    repeat: Infinity,
-                                    ease: "easeInOut"
-                                }}
-                            />
+                            <img src={logo} alt="Jeenora" className="h-5 w-auto mr-2 drop-shadow-sm" />
                             <span className="text-rose-900 font-extrabold text-[14px] tracking-tight">
                                 Jeenora
                             </span>
@@ -93,12 +79,7 @@ const HomeGreeting = () => {
                             onClick={handleOrganicsClick}
                             className="bg-gradient-to-r from-emerald-100/50 to-teal-100/50 px-3 py-1.5 rounded-lg border border-emerald-200 flex items-center group active:scale-95 transition-all cursor-pointer shadow-md hover:shadow-premium"
                         >
-                            <motion.div
-                                animate={{ y: [0, -2, 0] }}
-                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                            >
-                                <Briefcase size={13} className="text-emerald-700 mr-2 group-hover:scale-110 transition-transform duration-300" />
-                            </motion.div>
+                            <Briefcase size={13} className="text-emerald-700 mr-2 group-hover:scale-110 transition-transform duration-300" />
                             <span className="text-emerald-900 font-extrabold text-[12px] group-hover:text-emerald-800 transition-colors">Organics</span>
                         </button>
                     </div>
@@ -126,21 +107,9 @@ const HomeGreeting = () => {
                             className="md:hidden flex items-center px-4 py-1.5 rounded-lg border border-blue-200 shadow-md transition-all active:scale-95 bg-gradient-to-r from-blue-100/50 to-indigo-100/50 group hover:border-blue-300"
                         >
                             {isLoggedIn && (profileInfo?.image || userInfo?.image) ? (
-                                <motion.img 
-                                    src={profileInfo?.image || userInfo?.image} 
-                                    className="w-5.5 h-5.5 rounded-full object-cover border-2 border-white shadow-sm"
-                                    whileHover={{ scale: 1.1 }}
-                                />
+                                <img src={profileInfo?.image || userInfo?.image} className="w-5.5 h-5.5 rounded-full object-cover border-2 border-white shadow-sm" />
                             ) : (
-                                <motion.div
-                                    animate={{ 
-                                        rotate: [0, 10, -10, 0],
-                                        y: [0, -1, 1, 0]
-                                    }}
-                                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                                >
-                                    <User size={15} className="text-blue-700 group-hover:text-blue-800 transition-colors" />
-                                </motion.div>
+                                <User size={15} className="text-blue-700 group-hover:text-blue-800 transition-colors" />
                             )}
                             <span className="ml-2 text-[12px] font-extrabold text-blue-900 uppercase tracking-tight">
                                 {isLoggedIn ? 'Account' : 'Login'}

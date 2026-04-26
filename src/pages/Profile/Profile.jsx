@@ -320,8 +320,8 @@ const Profile = () => {
             }}></div>
 
             {/* HEADER (Color-rich & Integrated) */}
-            <div className="pt-[58px] md:pt-[80px]">
-                <div className="pb-8 px-4 pt-5 relative overflow-hidden">
+            <div className="pt-[48px] md:pt-[60px]">
+                <div className="pb-8 px-4 pt-2 relative overflow-hidden">
                     {/* Subtle Glow Effect */}
                     <div className="absolute top-0 left-0 w-48 h-48 bg-primary/5 blur-[80px] rounded-full -translate-x-1/2 -translate-y-1/2" />
                     
