@@ -40,6 +40,7 @@ const Home = () => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [filterMode, setFilterMode] = useState('all');
     const [loadError, setLoadError] = useState(false);
+    const [isFetching, setIsFetching] = useState(false);
     const lastScrollY = useRef(0);
 
     useEffect(() => {
@@ -82,25 +83,28 @@ const Home = () => {
 
     useEffect(() => {
         setLoadError(false);
+        setIsFetching(true);
         dispatch(get_wear_products({ 
             ...filterState,
             limit: 15,
             append: filterState.page > 1
-        })).unwrap().catch(() => setLoadError(true));
+        })).unwrap()
+          .finally(() => setIsFetching(false))
+          .catch(() => setLoadError(true));
     }, [dispatch, filterState]);
 
     // Infinite Scroll Logic
     useEffect(() => {
         const handleInfiniteScroll = () => {
-            if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight) {
-                if (!prodLoader && !loadError && products.length < totalProducts) {
+            if (window.innerHeight + document.documentElement.scrollTop + 150 >= document.documentElement.offsetHeight) {
+                if (!isFetching && !prodLoader && !loadError && products.length < totalProducts && totalProducts > 0) {
                     setFilterState(prev => ({ ...prev, page: prev.page + 1 }));
                 }
             }
         };
         window.addEventListener('scroll', handleInfiniteScroll);
         return () => window.removeEventListener('scroll', handleInfiniteScroll);
-    }, [prodLoader, loadError, products.length, totalProducts]);
+    }, [isFetching, prodLoader, loadError, products.length, totalProducts]);
 
     const handleGenderCycle = () => {
         const genders = ['', 'men', 'women', 'unisex'];
