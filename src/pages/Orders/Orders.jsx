@@ -95,25 +95,25 @@ const Orders = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.05 }}
                                     onClick={() => navigate(`/order-details/${order._id}`)}
-                                    className="bg-white p-5 mb-4 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] border border-gray-100 cursor-pointer hover:border-primary/20 hover:shadow-md transition-all active:scale-[0.99] group"
+                                    className="bg-white px-2 py-6 cursor-pointer border-b border-gray-100 hover:bg-gray-50/50 transition-all active:scale-[0.99] group first:rounded-t-2xl last:rounded-b-2xl last:border-b-0"
                                 >
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
                                             <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block mb-0.5">Order ID</span>
                                             <h4 className="text-sm font-bold text-secondary tracking-tight">#{order._id.slice(-8).toUpperCase()}</h4>
                                         </div>
-                                        <div className={`px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm ${status.bg}`}>
+                                        <div className={`px-2.5 py-1 rounded-lg flex items-center gap-1.5 ${status.bg}`}>
                                             <span className={status.text}>{status.icon}</span>
                                             <span className={`text-[9px] font-bold uppercase tracking-wider ${status.text}`}>{status.label}</span>
                                         </div>
                                     </div>
 
                                     <div className="flex gap-4 items-center">
-                                        <div className="w-16 h-20 rounded-xl bg-gray-50 overflow-hidden flex-shrink-0 shadow-sm border border-gray-100">
+                                        <div className="w-16 h-20 rounded-xl bg-gray-50 overflow-hidden flex-shrink-0 border border-gray-100">
                                             <img 
                                                 src={order.products[0]?.images?.[0] || order.products[0]?.image || '/placeholder.jpg'} 
                                                 alt="prod" 
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                className="w-full h-full object-cover"
                                             />
                                         </div>
                                         <div className="flex-1 flex flex-col justify-center min-w-0">
@@ -129,15 +129,13 @@ const Orders = () => {
                                                     Ordered: {orderDate.toLocaleDateString()}
                                                 </p>
                                             </div>
-                                            <div className="mt-1 flex items-center gap-2">
+                                            <div className="mt-2 flex items-center gap-2">
                                                 <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Total</span>
                                                 <p className="text-sm font-bold text-primary tracking-tight">₹{order.price}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center">
-                                            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100 group-hover:bg-primary/5 group-hover:border-primary/10 transition-colors">
-                                                <ChevronRight size={16} className="text-gray-300 group-hover:text-primary transition-all group-hover:translate-x-0.5" />
-                                            </div>
+                                            <ChevronRight size={18} className="text-gray-300 group-hover:text-primary transition-all group-hover:translate-x-0.5" />
                                         </div>
                                     </div>
                                 </motion.div>
