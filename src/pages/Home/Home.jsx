@@ -135,14 +135,6 @@ const Home = () => {
             </div>
 
             <div className="mt-4 px-1.5 md:px-0 pb-20">
-                <StickyFilterBar 
-                    isHeaderCollapsed={isHeaderCollapsed}
-                    activeFilters={filterState}
-                    onOpenFilter={(mode) => {
-                        setFilterMode(mode);
-                        setIsFilterOpen(true);
-                    }}
-                />
 
                 <FilterBottomSheet 
                     isOpen={isFilterOpen}
