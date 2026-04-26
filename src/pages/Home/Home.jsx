@@ -22,7 +22,7 @@ const Home = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { categories, loader: catLoader } = useSelector(state => state.wearCategory);
-    const { products, loader: prodLoader } = useSelector(state => state.wearProduct);
+    const { products, totalProducts, loader: prodLoader } = useSelector(state => state.wearProduct);
 
     const [filterState, setFilterState] = useState({
         sort: 'newest',
@@ -91,14 +91,14 @@ const Home = () => {
     useEffect(() => {
         const handleInfiniteScroll = () => {
             if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight) {
-                if (!prodLoader) {
+                if (!prodLoader && products.length < totalProducts) {
                     setFilterState(prev => ({ ...prev, page: prev.page + 1 }));
                 }
             }
         };
         window.addEventListener('scroll', handleInfiniteScroll);
         return () => window.removeEventListener('scroll', handleInfiniteScroll);
-    }, [prodLoader]);
+    }, [prodLoader, products.length, totalProducts]);
 
     const handleGenderCycle = () => {
         const genders = ['', 'men', 'women', 'unisex'];
@@ -168,7 +168,8 @@ const Home = () => {
                 </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 lg:gap-5">
-                    {prodLoader ? (
+                    {/* Initial Loading */}
+                    {prodLoader && filterState.page === 1 ? (
                         [1,2,3,4,5,6,7,8].map(i => (
                             <div key={i} className="aspect-[3/4] bg-gray-100 animate-pulse rounded-xl"></div>
                         ))
@@ -178,6 +179,13 @@ const Home = () => {
                         ))
                     )}
                 </div>
+
+                {/* Infinite Scroll Loader */}
+                {prodLoader && filterState.page > 1 && (
+                    <div className="py-8 flex justify-center items-center">
+                        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                    </div>
+                )}
 
                 {products.length === 0 && !prodLoader && (
                     <div className="py-20 flex flex-col items-center justify-center opacity-40">
