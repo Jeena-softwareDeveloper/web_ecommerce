@@ -215,6 +215,19 @@ const ProductDetail = () => {
             return true;
         });
     }, [product?.offers, systemOffers]);
+    
+    // Stable order for styles
+    const allStyles = useMemo(() => {
+        if (!product) return [];
+        const combined = [product, ...similarProducts];
+        // Deduplicate by ID
+        const unique = combined.reduce((acc, curr) => {
+            if (!acc.find(p => p._id === curr._id)) acc.push(curr);
+            return acc;
+        }, []);
+        // Sort by ID to keep order absolutely stable across navigation
+        return unique.sort((a, b) => a._id.localeCompare(b._id));
+    }, [product, similarProducts]);
 
     // Cart
     const handleAddToCart = async (buyNow = false) => {
@@ -415,21 +428,24 @@ const ProductDetail = () => {
                             )}
                         </div>
                         <div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
-                             <div className="relative flex-shrink-0">
-                                <div className="w-[60px] h-[75px] rounded-xl border-2 border-[#e11955] overflow-hidden bg-white">
-                                    <img src={images[0]} className="w-full h-full object-cover" alt="" />
-                                </div>
-                            </div>
-                            {/* Other styles */}
-                            {similarProducts.filter(p => p._id !== product._id).map((p, i) => (
-                                <button
-                                    key={p._id || i}
-                                    onClick={() => { navigate(`/product/${p.slug || p._id}`, { replace: true }); }}
-                                    className="relative flex-shrink-0 w-[60px] h-[75px] rounded-xl border border-gray-100 overflow-hidden bg-white"
-                                >
-                                    <img src={resolveImageUrl(p.images?.[0] || p.image)} className="w-full h-full object-cover" alt="" />
-                                </button>
-                            ))}
+                            {allStyles.map((p, i) => {
+                                const isCurrent = p._id === product._id;
+                                const img = isCurrent ? images[0] : resolveImageUrl(p.images?.[0] || p.image);
+                                return (
+                                    <button
+                                        key={p._id || i}
+                                        onClick={() => { 
+                                            if (!isCurrent) {
+                                                navigate(`/product/${p.slug || p._id}`, { replace: true });
+                                            }
+                                        }}
+                                        className={`relative flex-shrink-0 w-[60px] h-[75px] rounded-xl border-2 overflow-hidden bg-white transition-all
+                                            ${isCurrent ? 'border-[#e11955]' : 'border-gray-100'}`}
+                                    >
+                                        <img src={img} className="w-full h-full object-cover" alt="" />
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
                 )}
