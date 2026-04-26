@@ -295,7 +295,7 @@ const Profile = () => {
                         <p className="text-white/70 text-[10px] font-bold uppercase tracking-wider">{config.sub}</p>
                     </div>
                 </div>
-                <div className="relative z-10 bg-white px-4 py-1.5 rounded-lg shadow-sm">
+                <div className="relative z-10 bg-white px-4 py-1.5 rounded-lg shadow-sm flex items-center justify-center">
                     <span className={`font-black text-[10px] uppercase tracking-wider ${config.btnC}`}>{config.btn}</span>
                 </div>
             </button>
@@ -376,7 +376,7 @@ const Profile = () => {
                         { label: 'My Orders', icon: <Package size={20} className="text-indigo-500" />, iconBg: 'bg-indigo-50', onPress: () => navigate('/orders') },
                         { label: 'Support', icon: <Headphones size={20} className="text-teal-500" />, iconBg: 'bg-teal-50', onPress: () => navigate('/support') }
                     ].map((stat, i) => (
-                        <button key={i} onClick={stat.onPress} className="flex-1 bg-white rounded-lg p-3 flex flex-row items-center justify-center shadow-sm border border-gray-50 hover:bg-gray-50 transition-colors">
+                        <button key={i} onClick={stat.onPress} className="flex-1 bg-white rounded-lg p-3 flex flex-row items-center justify-center shadow-sm border border-gray-200 hover:border-primary/20 hover:bg-gray-50 transition-all active:scale-95">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${stat.iconBg}`}>
                                 {stat.icon}
                             </div>
