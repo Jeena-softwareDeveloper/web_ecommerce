@@ -95,7 +95,7 @@ const Orders = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.05 }}
                                     onClick={() => navigate(`/order-details/${order._id}`)}
-                                    className="bg-white px-3 py-6 cursor-pointer border-b border-gray-200/60 hover:bg-gray-50/50 transition-all active:scale-[0.99] group first:rounded-t-2xl last:rounded-b-2xl last:border-b-0"
+                                    className="bg-white px-3 py-6 cursor-pointer border-b border-gray-300 hover:bg-gray-50/50 transition-all active:scale-[0.99] group first:rounded-t-2xl last:rounded-b-2xl last:border-b-0"
                                 >
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
