@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { toast } from "sonner";
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
@@ -86,6 +86,25 @@ const ProductDetail = () => {
     const [estimatedDate, setEstimatedDate] = useState(null);
     const [sellerCity, setSellerCity] = useState('');
     const [localPincode, setLocalPincode] = useState('');
+    const imageScrollRef = useRef(null);
+
+    const handleImageScroll = (e) => {
+        const scrollPosition = e.target.scrollLeft;
+        const width = e.target.clientWidth;
+        const index = Math.round(scrollPosition / width);
+        if (index !== activeImageIndex) {
+            setActiveImageIndex(index);
+        }
+    };
+
+    const scrollToImage = (index) => {
+        if (imageScrollRef.current) {
+            imageScrollRef.current.scrollTo({
+                left: index * imageScrollRef.current.clientWidth,
+                behavior: 'smooth'
+            });
+        }
+    };
 
     // 1. Automatic Location Detection (if no pincode)
     useEffect(() => {
@@ -346,26 +365,28 @@ const ProductDetail = () => {
 
                 {/* ===== 1. IMAGE CAROUSEL ===== */}
                 <div className="bg-white relative md:rounded-2xl md:overflow-hidden md:border md:border-gray-100 md:shadow-sm">
-                    <div className="relative overflow-hidden" style={{ aspectRatio: '1/1' }}>
+                    <div className="relative" style={{ aspectRatio: '1/1' }}>
                         <div
-                            className="flex h-full transition-transform duration-300 ease-out"
-                            style={{ transform: `translateX(-${activeImageIndex * 100}%)` }}
+                            ref={imageScrollRef}
+                            onScroll={handleImageScroll}
+                            className="flex h-full overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth"
+                            style={{ scrollBehavior: 'smooth' }}
                         >
                             {images.map((img, idx) => (
                                 <div 
                                     key={idx} 
-                                    className="flex-none w-full h-full flex items-center justify-center bg-white cursor-zoom-in relative group overflow-hidden" 
+                                    className="flex-none w-full h-full snap-center flex items-center justify-center bg-white cursor-zoom-in relative group overflow-hidden" 
                                     onClick={() => { setSelectedImageToView(img); setShowImageViewer(true); }}
                                 >
                                     <motion.img 
                                         src={img} 
                                         alt={displayName} 
-                                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-150 origin-center" 
-                                        whileHover={{ scale: 1.5 }}
+                                        className="w-full h-full object-contain transition-transform duration-500 md:group-hover:scale-150 origin-center" 
+                                        whileHover={{ scale: window.innerWidth > 768 ? 1.5 : 1 }}
                                         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                                     />
-                                    {/* Zoom Hint */}
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors pointer-events-none flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                    {/* Zoom Hint (Desktop Only) */}
+                                    <div className="absolute inset-0 bg-black/0 md:group-hover:bg-black/5 transition-colors pointer-events-none hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100">
                                         <div className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg">
                                             <Zap size={20} className="text-[#e11955]" />
                                         </div>
@@ -390,7 +411,7 @@ const ProductDetail = () => {
                         {images.map((_, i) => (
                             <button
                                 key={i}
-                                onClick={() => setActiveImageIndex(i)}
+                                onClick={() => scrollToImage(i)}
                                 className={`h-1.5 rounded-full transition-all duration-300 ${activeImageIndex === i ? 'w-6 bg-[#e11955]' : 'w-4 bg-gray-200'}`}
                             />
                         ))}
@@ -403,7 +424,7 @@ const ProductDetail = () => {
                         {images.map((img, i) => (
                             <button
                                 key={i}
-                                onClick={() => setActiveImageIndex(i)}
+                                onClick={() => scrollToImage(i)}
                                 className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${activeImageIndex === i ? 'border-[#e11955]' : 'border-gray-100'}`}
                             >
                                 <img src={img} className="w-full h-full object-cover" alt="" />
@@ -1251,14 +1272,14 @@ const ProductDetail = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[2000] bg-black/98 flex items-center justify-center overflow-hidden"
+                        className="fixed inset-0 z-[2000] bg-white/5 backdrop-blur-2xl flex items-center justify-center overflow-hidden"
                     >
                         {/* Close button - always visible */}
                         <button
                             onClick={() => setShowImageViewer(false)}
-                            className="absolute top-12 right-6 z-[2001] bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full p-3 transition-all"
+                            className="absolute top-12 right-6 z-[2001] bg-black/5 hover:bg-black/10 backdrop-blur-md rounded-full p-3 transition-all"
                         >
-                            <X size={28} className="text-white" />
+                            <X size={28} className="text-black" />
                         </button>
 
                         {/* Image Container with Zoom Logic */}
@@ -1273,7 +1294,7 @@ const ProductDetail = () => {
                                     src={selectedImageToView} 
                                     initial={{ scale: 0.8, y: 20 }}
                                     animate={{ scale: 1, y: 0 }}
-                                    className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" 
+                                    className="max-w-full max-h-full object-contain" 
                                     alt="Zoomed Product" 
                                     style={{ touchAction: 'none' }}
                                 />
@@ -1282,8 +1303,8 @@ const ProductDetail = () => {
 
                         {/* Zoom Instructions Strip */}
                         <div className="absolute bottom-10 left-0 right-0 flex justify-center pointer-events-none">
-                            <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">
-                                <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">
+                            <div className="bg-black/5 backdrop-blur-sm px-4 py-2 rounded-full border border-black/10">
+                                <p className="text-black/50 text-[10px] font-bold uppercase tracking-widest">
                                     Click outside or press X to close • Use 2 fingers to zoom
                                 </p>
                             </div>
