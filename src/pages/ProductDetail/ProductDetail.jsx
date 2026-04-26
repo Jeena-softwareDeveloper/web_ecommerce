@@ -592,6 +592,46 @@ const ProductDetail = () => {
                         <div className="w-1 h-1 rounded-full bg-gray-300"></div>
                         <TrustedBadge />
                     </div>
+
+                    {/* Volume Discounts (Desktop) */}
+                    {(() => {
+                        const tiers = currentVariant?.priceTiers || [];
+                        if (tiers.length === 0) return null;
+                        return (
+                            <div className="hidden md:block mt-4 p-4 rounded-2xl bg-indigo-50/30 border border-indigo-100/50">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <div className="bg-indigo-100 p-1 rounded-lg">
+                                        <Zap size={16} className="text-indigo-600" />
+                                    </div>
+                                    <span className="text-[13px] font-bold text-gray-800 uppercase tracking-tight">Bulk Purchase Discounts</span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {tiers.map((tier, tIdx) => {
+                                        const isActive = selectedQty >= tier.minQty && !tiers.some(t => t.minQty > tier.minQty && selectedQty >= t.minQty);
+                                        return (
+                                            <button
+                                                key={tIdx}
+                                                onClick={() => setSelectedQty(isActive ? 1 : tier.minQty)}
+                                                className={`flex items-center justify-between p-3 rounded-xl border-2 transition-all shadow-sm ${isActive ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-indigo-50 hover:border-indigo-200'}`}
+                                            >
+                                                <div className="flex flex-col items-start">
+                                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'text-white/70' : 'text-gray-400'}`}>Order</span>
+                                                    <span className={`text-[14px] font-black ${isActive ? 'text-white' : 'text-gray-900'}`}>{tier.minQty}+ Qty</span>
+                                                </div>
+                                                <div className="flex flex-col items-end">
+                                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'text-white/70' : 'text-gray-400'}`}>Price</span>
+                                                    <span className={`text-[16px] font-black ${isActive ? 'text-white' : 'text-[#e11955]'}`}>₹{tier.price}</span>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <p className="text-[10px] text-gray-400 font-medium mt-3 text-center uppercase tracking-widest italic">
+                                    Select a quantity to apply the discounted price automatically
+                                </p>
+                            </div>
+                        );
+                    })()}
                 </div>
 
                 {/* Desktop action buttons — shown only on md+ IN the right column */}
@@ -1083,32 +1123,30 @@ const ProductDetail = () => {
             </div>{/* end pt-[52px] */}
 
             {/* ===== STICKY BOTTOM BAR (mobile only) ===== */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] rounded-t-[28px]">
-                {/* Bulk pricing strip */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 shadow-2xl">
+                {/* Bulk pricing strip (Mobile) */}
                 {(() => {
                     const tiers = currentVariant?.priceTiers || [];
                     if (tiers.length === 0) return null;
                     return (
-                        <div className="bg-gradient-to-r from-indigo-50/80 to-blue-50/80 px-5 py-3.5 border-b border-indigo-100/50 rounded-t-[28px]">
-                            <div className="flex items-center mb-2.5 gap-1.5">
-                                <div className="bg-indigo-600 p-0.5 rounded-sm">
-                                    <Zap size={10} className="text-white fill-white" />
-                                </div>
-                                <span className="text-[10px] font-black text-indigo-700 uppercase tracking-[0.1em]">Volume Discounts (Tap to Apply)</span>
+                        <div className="bg-indigo-50/30 px-4 py-2 border-b border-indigo-100/50">
+                            <div className="flex items-center mb-1 gap-1">
+                                <Zap size={11} className="text-indigo-600" />
+                                <span className="text-[9px] font-black text-indigo-600 uppercase tracking-wider">Volume Discounts</span>
                             </div>
-                            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-0.5">
+                            <div className="flex gap-2 overflow-x-auto no-scrollbar py-0.5">
                                 {tiers.map((tier, tIdx) => {
                                     const isActive = selectedQty >= tier.minQty && !tiers.some(t => t.minQty > tier.minQty && selectedQty >= t.minQty);
                                     return (
                                         <button
                                             key={tIdx}
                                             onClick={() => setSelectedQty(isActive ? 1 : tier.minQty)}
-                                            className={`border-2 rounded-2xl px-4 py-2 flex-shrink-0 flex items-center gap-3 shadow-sm transition-all active:scale-95 ${isActive ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-indigo-50 hover:border-indigo-200'}`}
+                                            className={`border rounded-lg px-2 py-1 flex-shrink-0 flex items-center gap-1.5 shadow-sm transition-all ${isActive ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-indigo-100'}`}
                                         >
-                                            <div className={`rounded-lg px-2 py-1 ${isActive ? 'bg-white/20' : 'bg-indigo-50'}`}>
-                                                <span className={`text-[10px] font-bold ${isActive ? 'text-white' : 'text-indigo-600'}`}>{tier.minQty}+ Qty</span>
+                                            <div className={`rounded px-1 py-0.5 ${isActive ? 'bg-white' : 'bg-indigo-600'}`}>
+                                                <span className={`text-[9px] font-black ${isActive ? 'text-indigo-600' : 'text-white'}`}>{tier.minQty}+</span>
                                             </div>
-                                            <span className={`text-[14px] font-black ${isActive ? 'text-white' : 'text-gray-900'}`}>₹{tier.price}</span>
+                                            <span className={`text-[12px] font-black ${isActive ? 'text-white' : 'text-gray-900'}`}>₹{tier.price}</span>
                                         </button>
                                     );
                                 })}
