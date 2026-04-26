@@ -67,9 +67,9 @@ const HomeGreeting = () => {
                     {/* Left: Brand Cards */}
                     <div className="flex items-center space-x-2.5">
                         {/* Brand Logo Card */}
-                        <div className="bg-gradient-to-r from-rose-50 to-orange-50 px-3 py-1.5 rounded-lg shadow-sm border border-rose-100/50 flex items-center group active:scale-95 transition-all">
+                        <div className="bg-gradient-to-r from-rose-100/50 to-orange-100/50 px-3 py-1.5 rounded-lg shadow-md border border-rose-200 flex items-center group active:scale-95 transition-all">
                             <img src={logo} alt="Jeenora" className="h-5 w-auto mr-2 drop-shadow-sm" />
-                            <span className="text-rose-950 font-bold text-[14px] tracking-tight">
+                            <span className="text-rose-900 font-extrabold text-[14px] tracking-tight">
                                 Jeenora
                             </span>
                         </div>
@@ -77,10 +77,10 @@ const HomeGreeting = () => {
                         {/* Organics Card */}
                         <button 
                             onClick={handleOrganicsClick}
-                            className="bg-gradient-to-r from-emerald-50 to-teal-50 px-3 py-1.5 rounded-lg border border-emerald-100/50 flex items-center group active:scale-95 transition-all cursor-pointer shadow-sm hover:shadow-premium"
+                            className="bg-gradient-to-r from-emerald-100/50 to-teal-100/50 px-3 py-1.5 rounded-lg border border-emerald-200 flex items-center group active:scale-95 transition-all cursor-pointer shadow-md hover:shadow-premium"
                         >
-                            <Briefcase size={13} className="text-emerald-600 mr-2 group-hover:scale-110 transition-transform duration-300" />
-                            <span className="text-emerald-900 font-bold text-[12px] group-hover:text-emerald-700 transition-colors">Organics</span>
+                            <Briefcase size={13} className="text-emerald-700 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                            <span className="text-emerald-900 font-extrabold text-[12px] group-hover:text-emerald-800 transition-colors">Organics</span>
                         </button>
                     </div>
 
@@ -104,14 +104,14 @@ const HomeGreeting = () => {
                         {/* Mobile Login Button */}
                         <button
                             onClick={() => navigate(isLoggedIn ? '/profile' : '/login')}
-                            className="md:hidden flex items-center px-4 py-1.5 rounded-lg border border-blue-100/50 shadow-sm transition-all active:scale-95 bg-gradient-to-r from-blue-50 to-indigo-50 group hover:border-blue-200"
+                            className="md:hidden flex items-center px-4 py-1.5 rounded-lg border border-blue-200 shadow-md transition-all active:scale-95 bg-gradient-to-r from-blue-100/50 to-indigo-100/50 group hover:border-blue-300"
                         >
                             {isLoggedIn && (profileInfo?.image || userInfo?.image) ? (
                                 <img src={profileInfo?.image || userInfo?.image} className="w-5.5 h-5.5 rounded-full object-cover border-2 border-white shadow-sm" />
                             ) : (
-                                <User size={15} className="text-blue-500 group-hover:text-blue-600 transition-colors" />
+                                <User size={15} className="text-blue-700 group-hover:text-blue-800 transition-colors" />
                             )}
-                            <span className="ml-2 text-[12px] font-bold text-blue-900 uppercase tracking-tight">
+                            <span className="ml-2 text-[12px] font-extrabold text-blue-900 uppercase tracking-tight">
                                 {isLoggedIn ? 'Account' : 'Login'}
                             </span>
                         </button>
