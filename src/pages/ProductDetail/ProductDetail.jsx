@@ -339,8 +339,24 @@ const ProductDetail = () => {
                             style={{ transform: `translateX(-${activeImageIndex * 100}%)` }}
                         >
                             {images.map((img, idx) => (
-                                <div key={idx} className="flex-none w-full h-full flex items-center justify-center bg-white cursor-zoom-in" onClick={() => { setSelectedImageToView(img); setShowImageViewer(true); }}>
-                                    <img src={img} alt={displayName} className="w-full h-full object-contain" />
+                                <div 
+                                    key={idx} 
+                                    className="flex-none w-full h-full flex items-center justify-center bg-white cursor-zoom-in relative group overflow-hidden" 
+                                    onClick={() => { setSelectedImageToView(img); setShowImageViewer(true); }}
+                                >
+                                    <motion.img 
+                                        src={img} 
+                                        alt={displayName} 
+                                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-150 origin-center" 
+                                        whileHover={{ scale: 1.5 }}
+                                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                                    />
+                                    {/* Zoom Hint */}
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors pointer-events-none flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                        <div className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg">
+                                            <Zap size={20} className="text-[#e11955]" />
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -1223,25 +1239,50 @@ const ProductDetail = () => {
                 )}
             </AnimatePresence>
 
-            {/* ===== FULL SCREEN IMAGE VIEWER ===== */}
+            {/* ===== FULL SCREEN IMAGE VIEWER WITH ENHANCED ZOOM ===== */}
             <AnimatePresence>
                 {showImageViewer && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[2000] bg-black/95 flex items-center justify-center"
-                        onClick={() => setShowImageViewer(false)}
+                        className="fixed inset-0 z-[2000] bg-black/98 flex items-center justify-center overflow-hidden"
                     >
+                        {/* Close button - always visible */}
                         <button
                             onClick={() => setShowImageViewer(false)}
-                            className="absolute top-12 right-5 bg-white/15 rounded-full p-2"
+                            className="absolute top-12 right-6 z-[2001] bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full p-3 transition-all"
                         >
-                            <X size={24} className="text-white" />
+                            <X size={28} className="text-white" />
                         </button>
-                        {selectedImageToView && (
-                            <img src={selectedImageToView} className="max-w-[95%] max-h-[70%] object-contain rounded-2xl" alt="" />
-                        )}
+
+                        {/* Image Container with Zoom Logic */}
+                        <motion.div 
+                            className="w-full h-full flex items-center justify-center p-4 cursor-grab active:cursor-grabbing"
+                            drag
+                            dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                            dragElastic={0.1}
+                        >
+                            {selectedImageToView && (
+                                <motion.img 
+                                    src={selectedImageToView} 
+                                    initial={{ scale: 0.8, y: 20 }}
+                                    animate={{ scale: 1, y: 0 }}
+                                    className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" 
+                                    alt="Zoomed Product" 
+                                    style={{ touchAction: 'none' }}
+                                />
+                            )}
+                        </motion.div>
+
+                        {/* Zoom Instructions Strip */}
+                        <div className="absolute bottom-10 left-0 right-0 flex justify-center pointer-events-none">
+                            <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">
+                                <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">
+                                    Click outside or press X to close • Use 2 fingers to zoom
+                                </p>
+                            </div>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
