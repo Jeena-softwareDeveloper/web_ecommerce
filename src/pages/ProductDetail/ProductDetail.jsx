@@ -575,7 +575,7 @@ const ProductDetail = () => {
                                 ))}
                             </div>
                             <p className="text-[11px] font-medium text-gray-600">
-                                <span className="font-bold text-gray-900">{socialStats[product._id]} people</span> bought this in the last month
+                                <span className="font-bold text-gray-900">{socialStats[product._id]} people</span> visited this product in the last month
                             </p>
                         </div>
                     )}
