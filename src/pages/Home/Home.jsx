@@ -30,7 +30,8 @@ const Home = () => {
         gender: '',
         size: '',
         color: '',
-        searchValue: ''
+        searchValue: '',
+        page: 1
     });
     
     // Header & Filter Sticky Logic
@@ -81,9 +82,23 @@ const Home = () => {
     useEffect(() => {
         dispatch(get_wear_products({ 
             ...filterState,
-            limit: 50 
+            limit: 20,
+            append: filterState.page > 1
         }));
     }, [dispatch, filterState]);
+
+    // Infinite Scroll Logic
+    useEffect(() => {
+        const handleInfiniteScroll = () => {
+            if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight) {
+                if (!prodLoader) {
+                    setFilterState(prev => ({ ...prev, page: prev.page + 1 }));
+                }
+            }
+        };
+        window.addEventListener('scroll', handleInfiniteScroll);
+        return () => window.removeEventListener('scroll', handleInfiniteScroll);
+    }, [prodLoader]);
 
     const handleGenderCycle = () => {
         const genders = ['', 'men', 'women', 'unisex'];

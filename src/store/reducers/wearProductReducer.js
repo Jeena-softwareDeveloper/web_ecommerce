@@ -179,13 +179,23 @@ export const wearProductSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(get_wear_products.pending, (state) => {
+            .addCase(get_wear_products.pending, (state, { meta }) => {
                 state.loader = true;
-                state.products = [];
+                if (!meta.arg.append) {
+                    state.products = [];
+                }
             })
-            .addCase(get_wear_products.fulfilled, (state, { payload }) => {
+            .addCase(get_wear_products.fulfilled, (state, { payload, meta }) => {
                 state.loader = false;
-                state.products = payload.products || [];
+                if (meta.arg.append) {
+                    // Filter out duplicates just in case
+                    const newProducts = payload.products || [];
+                    const existingIds = new Set(state.products.map(p => p._id));
+                    const filteredNew = newProducts.filter(p => !existingIds.has(p._id));
+                    state.products = [...state.products, ...filteredNew];
+                } else {
+                    state.products = payload.products || [];
+                }
                 state.totalProducts = payload.totalProducts || payload.totalProduct || 0;
             })
             .addCase(get_wear_products.rejected, (state, { payload }) => {
