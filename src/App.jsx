@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { check_auth } from './store/reducers/authReducer';
 import { get_cart } from './store/reducers/wearCartReducer';
@@ -11,54 +11,58 @@ import PrivateRoutes from './routes/PrivateRoutes';
 import PublicRoutes from './routes/PublicRoutes';
 import UserRoutes from './routes/UserRoutes';
 
-// Pages
+// ✅ Eager — critical path (first paint)
 import Home from './pages/Home/Home';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
-import Search from './pages/Search/Search';
 import ProductList from './pages/ProductList/ProductList';
 import ProductDetail from './pages/ProductDetail/ProductDetail';
-import Cart from './pages/Cart/Cart';
-import Profile from './pages/Profile/Profile';
-import Checkout from './pages/Checkout/Checkout';
-import OrderSuccess from './pages/OrderSuccess/OrderSuccess';
 
-import Orders from './pages/Orders/Orders';
-import OrderDetails from './pages/OrderDetails/OrderDetails';
-import SupplierHub from './pages/SupplierHub/SupplierHub';
-import SupplierRegistration from './pages/SupplierRegistration/SupplierRegistration';
-import SupplierDashboard from './pages/SupplierDashboard/SupplierDashboard';
-import SupplierInventory from './pages/SupplierInventory/SupplierInventory';
-import SupplierMenu from './pages/SupplierMenu/SupplierMenu';
-import SupplierCatalogUpload from './pages/SupplierCatalogUpload/SupplierCatalogUpload';
-import SupplierOrders from './pages/SupplierOrders/SupplierOrders';
-import SupplierReturns from './pages/SupplierReturns/SupplierReturns';
-import SupplierPayments from './pages/SupplierPayments/SupplierPayments';
-import SupplierPricing from './pages/SupplierPricing/SupplierPricing';
-import SupplierWarehouse from './pages/SupplierWarehouse/SupplierWarehouse';
-import SupplierPromotions from './pages/SupplierPromotions/SupplierPromotions';
-import SupplierOfferZone from './pages/SupplierOfferZone/SupplierOfferZone';
-import SupplierPriceRecommendation from './pages/SupplierPriceRecommendation/SupplierPriceRecommendation';
-import SupplierQualityDashboard from './pages/SupplierQualityDashboard/SupplierQualityDashboard';
-import MenuNameScreenPage from './pages/Menu/MenuNameScreenPage';
+// 🚀 Lazy — loaded on demand only
+const Search = lazy(() => import('./pages/Search/Search'));
+const Cart = lazy(() => import('./pages/Cart/Cart'));
+const Profile = lazy(() => import('./pages/Profile/Profile'));
+const Checkout = lazy(() => import('./pages/Checkout/Checkout'));
+const OrderSuccess = lazy(() => import('./pages/OrderSuccess/OrderSuccess'));
+const Orders = lazy(() => import('./pages/Orders/Orders'));
+const OrderDetails = lazy(() => import('./pages/OrderDetails/OrderDetails'));
+const MenuNameScreenPage = lazy(() => import('./pages/Menu/MenuNameScreenPage'));
 
-// Profile Subpages
-import Addresses from './pages/Profile/Addresses';
-import Wallet from './pages/Profile/Wallet';
-import EditProfile from './pages/Profile/EditProfile';
-import Language from './pages/Profile/Language';
-import AICustomerSupport from './pages/CustomerSupport/AICustomerSupport';
+// 🚀 Supplier pages — lazy (heavy, rarely visited by buyers)
+const SupplierHub = lazy(() => import('./pages/SupplierHub/SupplierHub'));
+const SupplierRegistration = lazy(() => import('./pages/SupplierRegistration/SupplierRegistration'));
+const SupplierDashboard = lazy(() => import('./pages/SupplierDashboard/SupplierDashboard'));
+const SupplierInventory = lazy(() => import('./pages/SupplierInventory/SupplierInventory'));
+const SupplierMenu = lazy(() => import('./pages/SupplierMenu/SupplierMenu'));
+const SupplierCatalogUpload = lazy(() => import('./pages/SupplierCatalogUpload/SupplierCatalogUpload'));
+const SupplierOrders = lazy(() => import('./pages/SupplierOrders/SupplierOrders'));
+const SupplierReturns = lazy(() => import('./pages/SupplierReturns/SupplierReturns'));
+const SupplierPayments = lazy(() => import('./pages/SupplierPayments/SupplierPayments'));
+const SupplierPricing = lazy(() => import('./pages/SupplierPricing/SupplierPricing'));
+const SupplierWarehouse = lazy(() => import('./pages/SupplierWarehouse/SupplierWarehouse'));
+const SupplierPromotions = lazy(() => import('./pages/SupplierPromotions/SupplierPromotions'));
+const SupplierOfferZone = lazy(() => import('./pages/SupplierOfferZone/SupplierOfferZone'));
+const SupplierPriceRecommendation = lazy(() => import('./pages/SupplierPriceRecommendation/SupplierPriceRecommendation'));
+const SupplierQualityDashboard = lazy(() => import('./pages/SupplierQualityDashboard/SupplierQualityDashboard'));
+
+// 🚀 Profile subpages — lazy
+const Addresses = lazy(() => import('./pages/Profile/Addresses'));
+const Wallet = lazy(() => import('./pages/Profile/Wallet'));
+const EditProfile = lazy(() => import('./pages/Profile/EditProfile'));
+const Language = lazy(() => import('./pages/Profile/Language'));
+const AICustomerSupport = lazy(() => import('./pages/CustomerSupport/AICustomerSupport'));
 
 import ScrollToTop from './components/common/ScrollToTop';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
-// Legal Pages
-import Terms from './pages/Legal/Terms';
-import Privacy from './pages/Legal/Privacy';
-import SecurityPolicy from './pages/Legal/SecurityPolicy';
+// Legal Pages — lazy
+const Terms = lazy(() => import('./pages/Legal/Terms'));
+const Privacy = lazy(() => import('./pages/Legal/Privacy'));
+const SecurityPolicy = lazy(() => import('./pages/Legal/SecurityPolicy'));
 
 // 404
 import NotFound from './pages/NotFound/NotFound';
+
 
 function App() {
   const dispatch = useDispatch();
@@ -111,6 +115,11 @@ function App() {
             },
           }}
         />
+        <Suspense fallback={
+          <div className="h-screen w-full flex items-center justify-center bg-green-600">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+          </div>
+        }>
         <Routes>
         {/* Public Routes without Layout */}
         <Route element={<PublicRoutes />}>
@@ -176,6 +185,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
 
         </Routes>
+        </Suspense>
       </ErrorBoundary>
     </Router>
   );

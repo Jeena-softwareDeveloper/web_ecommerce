@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from 'sonner';
 import { store } from '../store';
 import { logout_user } from '../store/reducers/authReducer';
 import { storage } from '../utils/storage';
@@ -79,19 +80,13 @@ api.interceptors.response.use(
       });
       
       // Show toast notification for non-401 errors
-      if (error.response.status !== 401 && typeof window !== 'undefined') {
-        import('sonner').then(({ toast }) => {
-          toast.error(errorMessage);
-        });
+      if (error.response.status !== 401) {
+        toast.error(errorMessage);
       }
     } else if (error.request) {
       // Request was made but no response received
       console.error('Network Error:', error.request);
-      if (typeof window !== 'undefined') {
-        import('sonner').then(({ toast }) => {
-          toast.error('Network error. Please check your connection.');
-        });
-      }
+      toast.error('Network error. Please check your connection.');
     } else {
       // Something else happened
       console.error('Request Error:', error.message);
