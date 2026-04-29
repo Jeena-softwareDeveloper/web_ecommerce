@@ -1,0 +1,55 @@
+# robots.txt — jeenora.com
+# Jeenora Premium Fashion Marketplace
+
+User-agent: *
+
+# Allow public pages
+Allow: /
+Allow: /products
+Allow: /product/
+Allow: /search
+Allow: /terms
+Allow: /privacy
+Allow: /security-policy
+
+# Disallow private / auth-only routes
+Disallow: /profile
+Disallow: /addresses
+Disallow: /wallet
+Disallow: /edit-profile
+Disallow: /checkout
+Disallow: /cart
+Disallow: /orders
+Disallow: /order-details/
+Disallow: /order-success
+Disallow: /support
+
+# Disallow supplier internal pages
+Disallow: /supplier-dashboard
+Disallow: /supplier-inventory
+Disallow: /supplier-menu
+Disallow: /catalog-upload
+Disallow: /supplier-orders
+Disallow: /supplier-returns
+Disallow: /supplier-payments
+Disallow: /supplier-pricing
+Disallow: /supplier-warehouse
+Disallow: /supplier-promotions
+Disallow: /offer-zone
+Disallow: /supplier-price-recommendation
+Disallow: /supplier-quality-dashboard
+
+# Block aggressive SEO bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+Sitemap: https://jeenora.com/sitemap.xml

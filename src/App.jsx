@@ -57,6 +57,9 @@ import Terms from './pages/Legal/Terms';
 import Privacy from './pages/Legal/Privacy';
 import SecurityPolicy from './pages/Legal/SecurityPolicy';
 
+// 404
+import NotFound from './pages/NotFound/NotFound';
+
 function App() {
   const dispatch = useDispatch();
   const { hasCheckedAuth, token } = useSelector(state => state.auth || {});
@@ -168,6 +171,9 @@ function App() {
         <Route element={<PrivateRoutes />}>
           <Route path="/order-success" element={<OrderSuccess />} />
         </Route>
+
+        {/* 🔴 Security: Catch-all 404 — prevents silent 200 on unknown routes */}
+        <Route path="*" element={<NotFound />} />
 
         </Routes>
       </ErrorBoundary>

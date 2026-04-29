@@ -2,17 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Security: IE compatibility mode off -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Security: CSP fallback (primary CSP enforced via Vercel response headers) -->
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://checkout.razorpay.com https://*.cashfree.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://res.cloudinary.com https://*.jeenora.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.jeenora.com wss://api.jeenora.com https://*.razorpay.com https://*.cashfree.com; frame-src https://api.razorpay.com https://*.cashfree.com; object-src 'none'; base-uri 'self'; form-action 'self' https://*.cashfree.com;" />
+    <!-- Security: Referrer Policy fallback -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="icon" type="image/png" href="/src/assets/logo192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    
+
+    <!-- SEO -->
     <title>Jeenora | Premium Fashion Marketplace</title>
     <meta name="description" content="Jeenora - India's most innovative B2B fashion marketplace. Buy directly from manufacturers with zero commission and unbeatable quality." />
-    
+    <meta name="robots" content="index, follow" />
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
-    
+
   </head>
   <body>
     <div id="root"></div>
