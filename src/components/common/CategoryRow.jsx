@@ -10,7 +10,7 @@ const CategoryRow = ({ categories = [], loading, onCategoryClick }) => {
 
     return (
         <div className="pt-3 pb-5 md:pt-6 overflow-hidden border-b border-transparent bg-[#FCFCFF]">
-            <div className="flex items-center justify-start overflow-x-auto no-scrollbar px-5 space-x-5 md:space-x-10">
+            <div className="flex items-center justify-start overflow-x-auto no-scrollbar px-4 space-x-3.5 md:space-x-7">
                 {loading && validCategories.length === 0 ? (
                     // Skeleton Loading
                     [1, 2, 3, 4, 5, 6].map((i) => (
@@ -25,7 +25,7 @@ const CategoryRow = ({ categories = [], loading, onCategoryClick }) => {
                     ))
                 ) : (
                     categoryPairs.map((pair, pairIdx) => (
-                        <div key={pairIdx} className="flex flex-col space-y-5 shrink-0 pb-1">
+                        <div key={pairIdx} className="flex flex-col space-y-3.5 shrink-0 pb-1">
                             {pair.map((cat) => (
                                 <div 
                                     key={cat._id} 
@@ -51,7 +51,7 @@ const CategoryRow = ({ categories = [], loading, onCategoryClick }) => {
                                     </div>
 
                                     {/* Label Section */}
-                                    <div className="flex flex-col items-center mt-2.5 w-full px-1">
+                                    <div className="flex flex-col items-center mt-1.5 w-full px-0.5">
                                         <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-tight text-gray-900 group-hover:text-primary transition-colors line-clamp-1 text-center">
                                             {cat.name}
                                         </span>

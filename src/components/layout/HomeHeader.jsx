@@ -9,7 +9,7 @@ const HomeHeader = ({ isCollapsed, isScrolled, onSearch, onFilter }) => {
                 ? 'glass shadow-premium' 
                 : 'bg-white/80 backdrop-blur-sm'
         }`}>
-            <div className="max-w-7xl mx-auto flex flex-col pt-1">
+            <div className="max-w-7xl mx-auto flex flex-col">
                 {/* 1. Brand & Account Row (Hides on scroll down) */}
                 <AnimatePresence initial={false}>
                     {!isCollapsed && (

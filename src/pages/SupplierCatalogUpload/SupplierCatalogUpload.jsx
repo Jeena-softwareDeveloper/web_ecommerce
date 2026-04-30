@@ -47,6 +47,7 @@ const SupplierCatalogUpload = () => {
         gstPercentage: '5',
         weight: '',
         dimensions: { length: '', width: '', height: '' },
+        supplierType: '', // Added Supplier Type
         highlights: {} // To store category specs answers
     });
     const [errors, setErrors] = useState({});
@@ -75,6 +76,7 @@ const SupplierCatalogUpload = () => {
     const [catLevel, setCatLevel] = useState(0); 
     const [selectedMain, setSelectedMain] = useState(null);
     const [selectedSub, setSelectedSub] = useState(null);
+    const [showTypeModal, setShowTypeModal] = useState(false); // Modal for Supplier Type
 
     useEffect(() => {
         const fetchPureCategories = async () => {
@@ -420,6 +422,7 @@ const SupplierCatalogUpload = () => {
             hsnCode: catalogInfo.hsnCode,
             gstPercentage: parseInt(catalogInfo.gstPercentage),
             weight: parseInt(catalogInfo.weight) || 0,
+            supplierType: catalogInfo.supplierType, // Added supplierType
             price: parseFloat(prod.variants[0].listingPrice) || 0,
             originalPrice: parseFloat(prod.variants[0].mrp) || 0,
             additionalDetails: prod.highlights, // Sending per-product specs
@@ -667,6 +670,16 @@ const SupplierCatalogUpload = () => {
                                             ) : 'Select target category'}
                                         </span>
                                         <ChevronRight size={18} className="text-[#7C3AED]" />
+                                    </div>
+                                </div>
+
+                                <div onClick={() => setShowTypeModal(true)} className="cursor-pointer">
+                                    <label className="text-[11px] font-bold text-gray-400 uppercase mb-2 block">Supplier Type*</label>
+                                    <div className={`bg-gray-50 border rounded-xl p-4 flex justify-between items-center group ${errors.supplierType ? 'border-red-400 ring-4 ring-red-50' : 'border-gray-300 shadow-sm'}`}>
+                                        <span className={`font-bold ${catalogInfo.supplierType ? 'text-gray-800' : 'text-gray-400 italic'}`}>
+                                            {catalogInfo.supplierType || 'Select Supplier Type'}
+                                        </span>
+                                        <ChevronDown size={18} className="text-[#7C3AED]" />
                                     </div>
                                 </div>
                             </div>
@@ -1331,6 +1344,46 @@ const SupplierCatalogUpload = () => {
                                         </button>
                                     ))
                                 )}
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+            
+            {/* SUPPLIER TYPE MODAL */}
+            <AnimatePresence>
+                {showTypeModal && (
+                    <>
+                        <motion.div 
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            onClick={() => setShowTypeModal(false)}
+                            className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm"
+                        />
+                        <motion.div 
+                            initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} 
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="fixed inset-x-0 bottom-0 z-[111] bg-white rounded-t-[32px] max-h-[85vh] flex flex-col max-w-md mx-auto shadow-2xl overflow-hidden"
+                        >
+                            <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto my-3" />
+                            <div className="px-6 pb-4 border-b border-gray-100 flex items-center justify-between">
+                                <h3 className="text-lg font-black text-gray-900">Select Supplier Type</h3>
+                                <button onClick={() => setShowTypeModal(false)} className="p-2 bg-gray-50 rounded-full text-gray-400"><X size={20} /></button>
+                            </div>
+                            <div className="p-6 space-y-3">
+                                {['Manufacturer', 'Wholesaler', 'Retailer', 'Brand'].map((type) => (
+                                    <button 
+                                        key={type}
+                                        onClick={() => {
+                                            setCatalogInfo({...catalogInfo, supplierType: type});
+                                            if (errors.supplierType) setErrors({...errors, supplierType: false});
+                                            setShowTypeModal(false);
+                                        }}
+                                        className={`w-full p-4 rounded-2xl border-2 transition-all flex items-center justify-between group ${catalogInfo.supplierType === type ? 'border-[#7C3AED] bg-purple-50/50' : 'border-gray-50 bg-white hover:border-purple-100'}`}
+                                    >
+                                        <span className={`font-bold ${catalogInfo.supplierType === type ? 'text-[#7C3AED]' : 'text-gray-700'}`}>{type}</span>
+                                        {catalogInfo.supplierType === type && <div className="w-5 h-5 bg-[#7C3AED] rounded-full flex items-center justify-center text-white"><Check size={12} strokeWidth={4} /></div>}
+                                    </button>
+                                ))}
                             </div>
                         </motion.div>
                     </>
