@@ -15,6 +15,7 @@ export default defineConfig({
     include: ['firebase/auth', 'firebase/app', 'firebase/analytics']
   },
   build: {
+    sourcemap: false,
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {

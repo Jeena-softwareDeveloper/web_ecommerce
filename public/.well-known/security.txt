@@ -1,18 +1,5 @@
-# Jeenora — Security Policy
-# https://jeenora.com/.well-known/security.txt
-
 Contact: mailto:security@jeenora.com
-Expires: 2027-04-29T00:00:00.000Z
-Preferred-Languages: en, ta
+Expires: 2027-04-30T00:00:00.000Z
+Preferred-Languages: en
 Canonical: https://jeenora.com/.well-known/security.txt
 Policy: https://jeenora.com/security-policy
-
-# We appreciate responsible disclosure.
-# Please do NOT publicly disclose vulnerabilities before we have had
-# a chance to investigate and remediate. We aim to respond within 48 hours.
-
-# Scope:
-# In scope:  jeenora.com, www.jeenora.com, api.jeenora.com
-# Out of scope: Third-party services, social engineering attacks
-
-# Acknowledgements: https://jeenora.com/security-policy
