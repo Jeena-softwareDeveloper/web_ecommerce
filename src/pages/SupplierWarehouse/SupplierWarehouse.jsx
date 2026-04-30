@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { get_warehouse_data, get_my_catalogs } from '../../store/reducers/vendorReducer';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { 
     ArrowLeft, Warehouse, Package, MapPin, 
@@ -12,12 +13,12 @@ import {
     ChevronRight, IndianRupee, Box, Layers
 } from 'lucide-react';
 import SupplierFooter from '../../components/layout/SupplierFooter';
-import { toast } from "sonner";
+// import { toast } from "sonner"; // Unused in this file but might be needed later
 
 const SupplierWarehouse = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { warehouseData, myCatalogs, loader } = useSelector(state => state.vendor);
+    const { warehouseData, loader } = useSelector(state => state.vendor);
     
     const [activeTab, setActiveTab] = useState('inventory'); // 'inventory', 'locations', 'staff', 'analytics'
     const [filters, setFilters] = useState({
@@ -185,11 +186,14 @@ const SupplierWarehouse = () => {
                     </div>
                     <div className="flex items-center gap-3">
                         <button 
-                            onClick={fetchWarehouseData}
+                            onClick={() => {
+                                dispatch(get_warehouse_data());
+                                dispatch(get_my_catalogs());
+                            }}
                             className="p-2 hover:bg-gray-100 rounded-lg"
-                            disabled={loading}
+                            disabled={loader}
                         >
-                            <RefreshCw size={20} className={`text-gray-600 ${loading ? 'animate-spin' : ''}`} />
+                            <RefreshCw size={20} className={`text-gray-600 ${loader ? 'animate-spin' : ''}`} />
                         </button>
                         <button className="p-2 hover:bg-gray-100 rounded-lg">
                             <Filter size={20} className="text-gray-600" />

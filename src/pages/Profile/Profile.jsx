@@ -1,14 +1,15 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from "sonner";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     User, Package, MapPin, CreditCard, 
     Settings, LogOut, ChevronRight, Wallet,
     ShieldCheck, Bell, MessageSquare, ArrowRight,
     Star, Edit2, Headphones, Activity, Gift, X, Check, Eye, EyeOff, Building, Globe,
-    ChevronLeft, RefreshCw, Smartphone, Search
+    ChevronLeft, RefreshCw, Smartphone, Search, Mail, ShieldAlert
 } from 'lucide-react';
 import { FaCheckCircle, FaExclamationTriangle, FaUniversity, FaCreditCard } from 'react-icons/fa';
 import apiClient from '../../api/apiClient';
@@ -49,7 +50,7 @@ const BottomModal = ({ isOpen, onClose, title, children }) => (
 const Profile = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { profileInfo, loader: loading, walletData, notificationSettings: backendNotificationSettings } = useSelector(state => state.profile);
+    const { profileInfo, loader: loading, notificationSettings: backendNotificationSettings } = useSelector(state => state.profile);
     const { token, userInfo } = useSelector(state => state.auth);
     const { supplierStatus, loader: vendorLoader } = useSelector(state => state.vendor);
 
@@ -63,6 +64,7 @@ const Profile = () => {
     // Form logic states
     const [supportSubmitting, setSupportSubmitting] = useState(false);
     const [privacySettings, setPrivacySettings] = useState({ profileVisibility: 'public', dataSharing: true });
+    const [verifyLoading, setVerifyLoading] = useState(false);
 
     // Bank Details Form State
     const [bankForm, setBankForm] = useState({
@@ -76,7 +78,6 @@ const Profile = () => {
     });
     const [isVerifyingBank, setIsVerifyingBank] = useState(false);
     const [isIFSCVerified, setIsIFSCVerified] = useState(false);
-    const [bankDetailsLoaded, setBankDetailsLoaded] = useState(false);
 
     useEffect(() => {
         if (token) {
@@ -110,7 +111,7 @@ const Profile = () => {
                 });
                 if (bankDetails.ifsc) setIsIFSCVerified(true);
             }
-            setBankDetailsLoaded(true);
+            // Bank details successfully loaded
         } catch (error) {
             console.error('Failed to fetch bank details', error);
         }
@@ -155,7 +156,7 @@ const Profile = () => {
             });
 
             // Then save to user profile
-            const response = await apiClient.put('/wear/user/bank-details', {
+            await apiClient.put('/wear/user/bank-details', {
                 bankDetails: {
                     accountHolderName: bankForm.accountHolderName,
                     accountNumber: bankForm.accountNumber,
@@ -190,6 +191,18 @@ const Profile = () => {
     const handleLogoutConfirm = () => {
         dispatch(logout_user());
         navigate('/');
+    };
+
+    const handleResendVerification = async () => {
+        setVerifyLoading(true);
+        try {
+            await apiClient.post('/wear/auth/resend-verification');
+            toast.success('Verification email sent! Check your inbox.');
+        } catch (err) {
+            toast.error(err.response?.data?.error || 'Failed to send email. Try again.');
+        } finally {
+            setVerifyLoading(false);
+        }
     };
 
     const renderMenuCard = (title, items) => (
@@ -369,6 +382,37 @@ const Profile = () => {
 
                     </div>
                 </div>
+
+                {/* EMAIL VERIFICATION BANNER */}
+                {profileInfo?.email && profileInfo?.emailVerified === false && (
+                    <motion.button
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        onClick={handleResendVerification}
+                        disabled={verifyLoading}
+                        className="mx-4 mb-4 w-[calc(100%-2rem)] bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 flex items-center gap-3 active:scale-[0.98] transition-all text-left disabled:opacity-60"
+                    >
+                        <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                            {verifyLoading
+                                ? <div className="w-4 h-4 border-2 border-amber-300 border-t-amber-600 rounded-full animate-spin" />
+                                : <ShieldAlert size={18} className="text-amber-600" />}
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-xs font-black text-amber-800">Email not verified</p>
+                            <p className="text-[10px] text-amber-600 font-semibold mt-0.5">
+                                {verifyLoading ? 'Sending link...' : 'Tap to send a verification link'}
+                            </p>
+                        </div>
+                        <Mail size={16} className="text-amber-400 shrink-0" />
+                    </motion.button>
+                )}
+                {profileInfo?.email && profileInfo?.emailVerified === true && (
+                    <div className="mx-4 mb-4 flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-2xl">
+                        <ShieldCheck size={14} className="text-emerald-500" />
+                        <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Email Verified</span>
+                        <span className="text-[10px] text-emerald-500 font-medium ml-1">{profileInfo.email}</span>
+                    </div>
+                )}
 
                 {/* QUICK STATS ROW */}
                 <div className="flex px-4 space-x-3 mt-2 mb-6 relative z-10 w-full">

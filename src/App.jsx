@@ -19,6 +19,10 @@ import ProductList from './pages/ProductList/ProductList';
 import ProductDetail from './pages/ProductDetail/ProductDetail';
 
 // 🚀 Lazy — loaded on demand only
+const ResetPassword = lazy(() => import('./pages/Auth/ResetPassword'));
+const VerifyEmail = lazy(() => import('./pages/Auth/VerifyEmail'));
+
+// 🚀 Lazy — loaded on demand only
 const Search = lazy(() => import('./pages/Search/Search'));
 const Cart = lazy(() => import('./pages/Cart/Cart'));
 const Profile = lazy(() => import('./pages/Profile/Profile'));
@@ -125,6 +129,9 @@ function App() {
         <Route element={<PublicRoutes />}>
           <Route path="/login" element={!token ? <Login /> : <Navigate to="/" />} />
           <Route path="/register" element={!token ? <Register /> : <Navigate to="/" />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/forgot-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
         </Route>
 
         {/* Global Routes with MainLayout */}

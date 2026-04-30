@@ -99,7 +99,10 @@ const Login = () => {
 
                             {/* Password Input */}
                             <div className="space-y-1.5">
-                                <label className="text-[10px] uppercase font-medium tracking-[0.15em] text-slate-600 ml-1">Password</label>
+                                <div className="flex items-center justify-between">
+                                    <label className="text-[10px] uppercase font-medium tracking-[0.15em] text-slate-600 ml-1">Password</label>
+                                    <Link to="/forgot-password" className="text-[10px] font-bold text-primary hover:opacity-70 transition-opacity uppercase tracking-widest">Forgot Password?</Link>
+                                </div>
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500">
                                         <Lock size={16} />
