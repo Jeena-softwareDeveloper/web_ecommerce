@@ -188,15 +188,9 @@ const Register = () => {
                     </form>
 
                     <div className="mt-6 text-center border-t border-gray-50 pt-5">
-                        <p className="text-slate-500 text-[12px] font-normal mb-3">
-                            Already have an account? <Link to="/login" className="text-primary font-medium hover:opacity-80 transition-colors underline underline-offset-4">Sign in here</Link>
+                        <p className="text-slate-500 text-[12px] font-normal">
+                            Already have an account? <Link to="/login" style={{ color: '#D80032' }} className="font-bold hover:opacity-80 transition-colors underline underline-offset-4">Sign in here</Link>
                         </p>
-                        <button 
-                            onClick={() => navigate('/')}
-                            className="text-slate-500 hover:text-slate-700 font-medium text-[10px] uppercase tracking-widest transition-all"
-                        >
-                            Back to Store
-                        </button>
                     </div>
                 </motion.div>
 

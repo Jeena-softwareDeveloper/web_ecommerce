@@ -99,9 +99,9 @@ const Login = () => {
 
                             {/* Password Input */}
                             <div className="space-y-1.5">
-                                <div className="flex items-center justify-between">
-                                    <label className="text-[10px] uppercase font-medium tracking-[0.15em] text-slate-600 ml-1">Password</label>
-                                    <Link to="/forgot-password" className="text-[10px] font-bold text-primary hover:opacity-70 transition-opacity uppercase tracking-widest">Forgot Password?</Link>
+                                <div className="flex items-center justify-between mb-1">
+                                    <label className="text-[10px] uppercase font-bold tracking-[0.15em] text-slate-700 ml-1">Password</label>
+                                    <Link to="/forgot-password" style={{ color: '#D80032' }} className="text-[11px] font-bold hover:opacity-70 transition-opacity uppercase tracking-widest">Forgot Password?</Link>
                                 </div>
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500">
@@ -141,17 +141,10 @@ const Login = () => {
                         </button>
                     </form>
 
-                    <div className="mt-8 space-y-4 text-center border-t border-gray-50 pt-6">
+                    <div className="mt-8 text-center border-t border-gray-50 pt-6">
                         <p className="text-slate-500 text-[13px] font-normal">
-                            Don't have an account? <Link to="/register" className="text-primary font-medium hover:opacity-80 transition-colors underline underline-offset-4">Create Account</Link>
+                            Don't have an account? <Link to="/register" style={{ color: '#D80032' }} className="font-bold hover:opacity-80 transition-colors underline underline-offset-4">Create Account</Link>
                         </p>
-                        
-                        <button 
-                            onClick={() => navigate('/')}
-                            className="text-slate-500 hover:text-slate-700 font-medium text-[11px] uppercase tracking-widest transition-all"
-                        >
-                            Back to Store
-                        </button>
                     </div>
                 </motion.div>
 
