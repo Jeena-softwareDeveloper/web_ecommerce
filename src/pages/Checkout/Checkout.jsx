@@ -360,45 +360,89 @@ const Checkout = () => {
         toast.success('Address deleted successfully');
     };
 
-    // Progress Stepper Component (Dynamic based on step)
-    const ProgressStepper = () => (
-        <div className="bg-transparent py-4 border-b border-gray-100/50 mb-2">
-            <div className="flex px-8 relative items-center justify-between max-w-lg mx-auto">
-                <div className="absolute top-[17px] left-16 right-16 h-[2px] bg-red-50" />
-                <div className={`absolute top-[17px] left-16 h-[3px] bg-[#e11955] transition-all duration-500 ${step === 2 ? 'w-full right-16' : 'w-1/2'}`} />
+    // Progress Stepper Component (Refined with proper centering & animations)
+    const ProgressStepper = () => {
+        const steps = [
+            { id: 0, label: 'Cart', icon: <ShoppingBag size={14} /> },
+            { id: 1, label: 'Address', icon: <MapPin size={14} /> },
+            { id: 2, label: 'Payment', icon: <CreditCard size={14} /> }
+        ];
 
-                {/* Step 1: Cart (Completed) */}
-                <div className="flex flex-col items-center z-10 w-16">
-                    <div className="bg-white p-0.5 rounded-full shadow-sm cursor-pointer" onClick={() => navigate('/cart')}>
-                        <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center border-2 border-green-50 text-white">
-                            <Check size={14} strokeWidth={3} />
-                        </div>
-                    </div>
-                    {!buyNowItem && <span className="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-tight text-center">Cart</span>}
-                </div>
+        // Current sub-step logic: 
+        // step 1 (Address) means step 1 is active, step 0 is done.
+        // step 2 (Payment) means step 2 is active, step 1 is done, step 0 is done.
+        const currentActiveStep = step; // step is 1 or 2
 
-                {/* Step 2: Address (Active or Completed) */}
-                <div className="flex flex-col items-center z-10 w-16">
-                    <div className="bg-white p-0.5 rounded-full shadow-sm cursor-pointer" onClick={() => setStep(1)}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 text-white transition-colors duration-500 ${step === 2 ? 'bg-green-500 border-green-50' : 'bg-[#e11955] border-red-50'}`}>
-                            {step === 2 ? <Check size={14} strokeWidth={3} /> : <MapPin size={14} />}
-                        </div>
-                    </div>
-                    <span className={`text-[10px] mt-2 uppercase tracking-tight text-center ${step === 1 ? 'font-semibold text-[#e11955]' : 'font-normal text-gray-400'}`}>Address</span>
-                </div>
+        return (
+            <div className="bg-white py-6 border-b border-gray-100 relative z-20">
+                <div className="max-w-md mx-auto px-6">
+                    <div className="flex items-center justify-between relative">
+                        {/* THE BACKGROUND LINE */}
+                        <div className="absolute top-[16px] left-4 right-4 h-[2px] bg-gray-100 z-0" />
+                        
+                        {/* THE ANIMATED PROGRESS LINE */}
+                        <motion.div 
+                            initial={{ width: '0%' }}
+                            animate={{ 
+                                width: step === 1 ? '50%' : '100%',
+                                transition: { duration: 0.8, ease: "circOut" }
+                            }}
+                            className="absolute top-[16px] left-0 h-[2.5px] bg-gradient-to-r from-emerald-500 via-[#e11955] to-[#e11955] z-0 origin-left"
+                            style={{ 
+                                left: '16px', 
+                                width: 'calc(100% - 32px)',
+                                transformOrigin: 'left'
+                            }}
+                        />
 
-                {/* Step 3: Payment (Pending or Active) */}
-                <div className="flex flex-col items-center z-10 w-16">
-                    <div className="bg-white p-0.5 rounded-full">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-500 ${step === 2 ? 'bg-[#e11955] border-2 border-red-50 text-white shadow-md' : 'bg-gray-50 border border-gray-100 text-gray-400'}`}>
-                            {step === 2 ? <CreditCard size={14} /> : <div className="w-2 h-2 rounded-full bg-gray-300" />}
-                        </div>
+                        {steps.map((s, idx) => {
+                            const isCompleted = (idx === 0) || (idx === 1 && step === 2);
+                            const isActive = (idx === 1 && step === 1) || (idx === 2 && step === 2);
+                            const isPending = !isCompleted && !isActive;
+
+                            return (
+                                <div key={s.id} className="flex flex-col items-center z-10 relative">
+                                    <motion.div 
+                                        initial={false}
+                                        animate={{ 
+                                            scale: isActive ? 1.1 : 1,
+                                            backgroundColor: isCompleted ? '#10b981' : (isActive ? '#e11955' : '#f9fafb'),
+                                            borderColor: isCompleted ? '#d1fae5' : (isActive ? '#ffe4e6' : '#f3f4f6')
+                                        }}
+                                        className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shadow-sm transition-colors duration-300`}
+                                        onClick={() => {
+                                            if (idx === 0) navigate('/cart');
+                                            if (idx === 1 && step === 2) setStep(1);
+                                        }}
+                                    >
+                                        {isCompleted ? (
+                                            <Check size={14} className="text-white" strokeWidth={4} />
+                                        ) : (
+                                            <div className={`${isActive ? 'text-white' : 'text-gray-400'}`}>
+                                                {isActive ? s.icon : <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />}
+                                            </div>
+                                        )}
+                                        
+                                        {/* Pulse effect for active step */}
+                                        {isActive && (
+                                            <motion.div 
+                                                animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] }}
+                                                transition={{ duration: 2, repeat: Infinity }}
+                                                className="absolute inset-0 bg-[#e11955] rounded-full -z-10"
+                                            />
+                                        )}
+                                    </motion.div>
+                                    <span className={`text-[10px] mt-2 font-black uppercase tracking-widest ${isActive ? 'text-[#e11955]' : isCompleted ? 'text-emerald-600' : 'text-gray-400'}`}>
+                                        {s.label}
+                                    </span>
+                                </div>
+                            );
+                        })}
                     </div>
-                    <span className={`text-[10px] mt-2 uppercase tracking-tight text-center ${step === 2 ? 'font-semibold text-[#e11955]' : 'font-normal text-gray-400'}`}>Payment</span>
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     const renderPaymentMethod = (id, label, icon, extraContent, disable = false) => (
         <button 

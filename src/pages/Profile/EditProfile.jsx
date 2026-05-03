@@ -115,11 +115,15 @@ const EditProfile = () => {
             <div className="px-4 py-8 max-w-xl mx-auto w-full">
                 <div className="flex flex-col items-center mb-10">
                     <div className="relative group">
-                        <img 
-                            src={imagePreview || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'} 
-                            className="w-32 h-32 rounded-[2.5rem] object-cover border-4 border-white shadow-2xl" 
-                            alt="avatar"
-                        />
+                        {imagePreview ? (
+                            <img src={imagePreview} className="w-32 h-32 rounded-[2.5rem] object-cover border-4 border-white shadow-2xl" alt="avatar" />
+                        ) : (
+                            <div className="w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-primary/5 to-primary/20 flex items-center justify-center border-4 border-white shadow-2xl text-primary">
+                                <span className="text-4xl font-black uppercase">
+                                    {(formData.name || 'G').charAt(0)}
+                                </span>
+                            </div>
+                        )}
                         <button 
                             type="button"
                             onClick={handleImageClick}

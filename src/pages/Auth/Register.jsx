@@ -89,10 +89,10 @@ const Register = () => {
                     {/* Register Form */}
                     <form onSubmit={handleSubmit} className="space-y-3.5">
                         <div className="space-y-2.5">
-                            <div className="grid grid-cols-2 gap-3">
-                                {/* Username Input */}
+                            <div className="space-y-2.5">
+                                {/* Name Input */}
                                 <div className="space-y-1">
-                                    <label className="text-[9px] uppercase font-medium tracking-widest text-slate-600 ml-1">Username</label>
+                                    <label className="text-[9px] uppercase font-bold tracking-widest text-slate-700 ml-1">Name</label>
                                     <div className="relative group">
                                         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-500">
                                             <User size={14} />
@@ -102,15 +102,15 @@ const Register = () => {
                                             name="username"
                                             value={form.username}
                                             onChange={handleChange}
-                                            placeholder="johndoe"
-                                            className={`w-full bg-gray-50/50 border rounded-lg py-3 pl-9 pr-3 text-black text-xs font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-gray-100'}`}
+                                            placeholder="Your full name"
+                                            className={`w-full bg-gray-50/50 border rounded-lg py-3 pl-9 pr-3 text-black text-xs font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-primary/20'}`}
                                         />
                                     </div>
                                 </div>
 
                                 {/* Phone Input */}
                                 <div className="space-y-1">
-                                    <label className="text-[9px] uppercase font-medium tracking-widest text-slate-600 ml-1">Phone</label>
+                                    <label className="text-[9px] uppercase font-bold tracking-widest text-slate-700 ml-1">Phone Number</label>
                                     <div className="relative group">
                                         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-500">
                                             <span className="text-[10px] font-medium tracking-tighter text-slate-600">+91</span>
@@ -121,7 +121,7 @@ const Register = () => {
                                             value={form.phone}
                                             onChange={handleChange}
                                             placeholder="9876543210"
-                                            className={`w-full bg-gray-50/50 border rounded-lg py-3 pl-9 pr-3 text-black text-xs font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-gray-100'}`}
+                                            className={`w-full bg-gray-50/50 border rounded-lg py-3 pl-9 pr-3 text-black text-xs font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-primary/20'}`}
                                         />
                                     </div>
                                 </div>
@@ -140,7 +140,7 @@ const Register = () => {
                                         value={form.email}
                                         onChange={handleChange}
                                         placeholder="name@example.com"
-                                        className={`w-full bg-gray-50/50 border rounded-lg py-3 pl-9 pr-3 text-black text-xs font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-gray-100'}`}
+                                        className={`w-full bg-gray-50/50 border rounded-lg py-3 pl-9 pr-3 text-black text-xs font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-primary/20'}`}
                                     />
                                 </div>
                             </div>
@@ -158,7 +158,7 @@ const Register = () => {
                                         value={form.password}
                                         onChange={handleChange}
                                         placeholder="••••••••"
-                                        className={`w-full bg-gray-50/50 border rounded-lg py-3 pl-9 pr-9 text-black text-xs font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-gray-100'}`}
+                                        className={`w-full bg-gray-50/50 border rounded-lg py-3 pl-9 pr-9 text-black text-xs font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-primary/20'}`}
                                     />
                                     <button 
                                         type="button"

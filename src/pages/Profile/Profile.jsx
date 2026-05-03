@@ -59,6 +59,9 @@ const Profile = () => {
     const [showSupportModal, setShowSupportModal] = useState(false);
     const [showNotificationModal, setShowNotificationModal] = useState(false);
     const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deletePassword, setDeletePassword] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     // Form logic states
@@ -191,6 +194,25 @@ const Profile = () => {
     const handleLogoutConfirm = () => {
         dispatch(logout_user());
         navigate('/');
+    };
+
+    const handleDeleteAccount = async (e) => {
+        e.preventDefault();
+        if (!deletePassword) return toast.error('Please enter your password');
+
+        setIsDeleting(true);
+        try {
+            const { data } = await apiClient.post('/wear/auth/delete-account', { password: deletePassword });
+            if (data.success) {
+                toast.success('Account deleted successfully');
+                dispatch(logout_user());
+                navigate('/');
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Failed to delete account');
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const handleResendVerification = async () => {
@@ -349,7 +371,15 @@ const Profile = () => {
                         <div className="flex items-center flex-1 cursor-pointer" onClick={() => navigate('/edit-profile')}>
                             <div className="relative group">
                                 <div className="absolute -inset-1 bg-gradient-to-tr from-primary via-indigo-400 to-rose-400 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-500" />
-                                <img src={profileInfo.image || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'} className="w-[88px] h-[88px] rounded-full border-4 border-white shadow-md object-cover bg-white relative z-10" alt="profile" />
+                                {profileInfo.image ? (
+                                    <img src={profileInfo.image} className="w-[88px] h-[88px] rounded-full border-4 border-white shadow-md object-cover bg-white relative z-10" alt="profile" />
+                                ) : (
+                                    <div className="w-[88px] h-[88px] rounded-full border-4 border-white shadow-md bg-gradient-to-br from-primary/5 to-primary/20 flex items-center justify-center relative z-10 text-primary border-white">
+                                        <span className="text-3xl font-black uppercase tracking-tighter">
+                                            {(profileInfo?.name || userInfo?.name || 'W').charAt(0)}
+                                        </span>
+                                    </div>
+                                )}
                                 <div className="absolute bottom-0 right-0 bg-white w-7 h-7 rounded-full flex items-center justify-center border border-gray-100 shadow-sm z-20">
                                     <Edit2 size={12} className="text-primary" />
                                 </div>
@@ -385,32 +415,48 @@ const Profile = () => {
 
                 {/* EMAIL VERIFICATION BANNER */}
                 {profileInfo?.email && profileInfo?.emailVerified === false && (
-                    <motion.button
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        onClick={handleResendVerification}
-                        disabled={verifyLoading}
-                        className="mx-4 mb-4 w-[calc(100%-2rem)] bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 flex items-center gap-3 active:scale-[0.98] transition-all text-left disabled:opacity-60"
-                    >
-                        <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                            {verifyLoading
-                                ? <div className="w-4 h-4 border-2 border-amber-300 border-t-amber-600 rounded-full animate-spin" />
-                                : <ShieldAlert size={18} className="text-amber-600" />}
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-xs font-black text-amber-800">Email not verified</p>
-                            <p className="text-[10px] text-amber-600 font-semibold mt-0.5">
-                                {verifyLoading ? 'Sending link...' : 'Tap to send a verification link'}
-                            </p>
-                        </div>
-                        <Mail size={16} className="text-amber-400 shrink-0" />
-                    </motion.button>
-                )}
-                {profileInfo?.email && profileInfo?.emailVerified === true && (
-                    <div className="mx-4 mb-4 flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-2xl">
-                        <ShieldCheck size={14} className="text-emerald-500" />
-                        <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Email Verified</span>
-                        <span className="text-[10px] text-emerald-500 font-medium ml-1">{profileInfo.email}</span>
+                    <div className="mx-4 mb-4 flex items-center gap-3">
+                        <motion.button
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            onClick={handleResendVerification}
+                            disabled={verifyLoading}
+                            className="flex-1 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 flex items-center gap-3 active:scale-[0.98] transition-all text-left disabled:opacity-60"
+                        >
+                            <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                                {verifyLoading
+                                    ? <div className="w-4 h-4 border-2 border-amber-300 border-t-amber-600 rounded-full animate-spin" />
+                                    : <ShieldAlert size={18} className="text-amber-600" />}
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-black text-amber-800">Email not verified</p>
+                                <p className="text-[10px] text-amber-600 font-semibold mt-0.5">
+                                    {verifyLoading ? 'Sending link...' : 'Tap to send a verification link'}
+                                </p>
+                            </div>
+                        </motion.button>
+                        
+                        <motion.button
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                                const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+                                
+                                if (isMobile && isIOS) {
+                                    // Try iOS Gmail app, fallback to web
+                                    window.location.href = "googlegmail://";
+                                    setTimeout(() => { window.open("https://mail.google.com", "_blank"); }, 800);
+                                } else {
+                                    // Android and Desktop: Open web version (Android will offer app if installed)
+                                    window.open("https://mail.google.com", "_blank");
+                                }
+                            }}
+                            className="w-12 h-[68px] bg-white border border-amber-200 rounded-2xl flex items-center justify-center shadow-sm active:scale-90 transition-all hover:bg-amber-50"
+                        >
+                            <Mail size={20} className="text-amber-500" />
+                        </motion.button>
                     </div>
                 )}
 
@@ -445,8 +491,7 @@ const Profile = () => {
 
                     {renderMenuCard("App Settings", [
                         { label: 'Notification Settings', icon: <Bell size={20} className="text-slate-500" />, bgColor: '#F8FAFC', onPress: () => setShowNotificationModal(true) },
-                        { label: 'Security & Privacy', icon: <ShieldCheck size={20} className="text-slate-500" />, bgColor: '#F8FAFC', onPress: () => setShowPrivacyModal(true) },
-                        { label: 'Rate our App', icon: <Star size={20} className="text-slate-500" />, bgColor: '#F8FAFC', onPress: () => window.open('https://play.google.com', '_blank') }
+                        { label: 'Security & Privacy', icon: <ShieldCheck size={20} className="text-slate-500" />, bgColor: '#F8FAFC', onPress: () => setShowPrivacyModal(true) }
                     ])}
 
                     <div className="py-10 flex flex-col items-center">
@@ -641,6 +686,69 @@ const Profile = () => {
                     <div className={`w-12 h-7 rounded-full flex items-center transition-colors px-1 ${privacySettings.dataSharing ? 'bg-green-500 justify-end' : 'bg-gray-300 justify-start'}`}>
                         <motion.div layout transition={{ type: "spring", stiffness: 500, damping: 30 }} className="w-5 h-5 bg-white rounded-full shadow-sm" />
                     </div>
+                </div>
+
+                <div className="mt-10 pt-6 border-t border-gray-100">
+                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-4">Danger Zone</p>
+                    <button 
+                        onClick={() => { setShowPrivacyModal(false); setShowDeleteModal(true); }}
+                        className="w-full flex items-center justify-between p-4 bg-red-50 rounded-2xl border border-red-100 group active:scale-95 transition-all"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-white rounded-xl text-red-500 shadow-sm group-hover:scale-110 transition-transform">
+                                <ShieldCheck size={18} />
+                            </div>
+                            <div className="text-left">
+                                <h4 className="text-sm font-black text-red-600 uppercase tracking-tighter">Delete Account</h4>
+                                <p className="text-[10px] text-red-400 font-bold uppercase">This action is permanent</p>
+                            </div>
+                        </div>
+                        <ArrowRight size={18} className="text-red-300" />
+                    </button>
+                </div>
+            </BottomModal>
+
+            {/* Delete Account Confirmation Modal */}
+            <BottomModal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Confirm Deletion">
+                <div className="flex flex-col items-center text-center">
+                    <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4 border-4 border-red-100/50">
+                        <ShieldCheck size={32} className="text-red-500" />
+                    </div>
+                    <h2 className="text-xl font-black text-gray-900 mb-2 tracking-tight">Are you absolutely sure?</h2>
+                    <p className="text-gray-500 text-xs mb-8 font-medium leading-relaxed">
+                        To protect your account, please enter your password to confirm deletion. Your data will be hidden and your sessions will be revoked.
+                    </p>
+                    
+                    <form onSubmit={handleDeleteAccount} className="w-full space-y-4">
+                        <div className="text-left">
+                            <label className="text-[10px] font-black text-gray-400 mb-2 uppercase tracking-widest block ml-1">Your Password</label>
+                            <input 
+                                required
+                                type="password" 
+                                value={deletePassword}
+                                onChange={(e) => setDeletePassword(e.target.value)}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-bold text-gray-800 outline-none focus:border-red-300" 
+                                placeholder="••••••••" 
+                            />
+                        </div>
+
+                        <div className="flex gap-3 pt-4">
+                            <button 
+                                type="button"
+                                onClick={() => setShowDeleteModal(false)}
+                                className="flex-1 py-4 border-2 border-gray-100 rounded-xl font-bold text-gray-500 hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                type="submit"
+                                disabled={isDeleting}
+                                className="flex-[2] bg-red-600 py-4 rounded-xl text-white font-black text-sm uppercase tracking-widest shadow-lg shadow-red-100 flex justify-center disabled:opacity-50"
+                            >
+                                {isDeleting ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "Delete Forever"}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </BottomModal>
 

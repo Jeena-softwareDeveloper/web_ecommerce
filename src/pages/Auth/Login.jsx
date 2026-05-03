@@ -82,17 +82,17 @@ const Login = () => {
                         <div className="space-y-3">
                             {/* Email Input */}
                             <div className="space-y-1.5">
-                                <label className="text-[10px] uppercase font-medium tracking-[0.15em] text-slate-600 ml-1">Email Address</label>
+                                <label className="text-[10px] uppercase font-bold tracking-[0.15em] text-slate-700 ml-1">Email or Phone Number</label>
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500">
                                         <Mail size={16} />
                                     </div>
                                     <input 
-                                        type="email"
+                                        type="text"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="name@example.com"
-                                        className={`w-full bg-gray-50/50 border rounded-lg py-3.5 pl-11 pr-5 text-black text-sm font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-gray-100'}`}
+                                        placeholder="Enter your email or phone"
+                                        className={`w-full bg-gray-50/50 border rounded-lg py-3.5 pl-11 pr-5 text-black text-sm font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-primary/20'}`}
                                     />
                                 </div>
                             </div>
@@ -112,7 +112,7 @@ const Login = () => {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="••••••••"
-                                        className={`w-full bg-gray-50/50 border rounded-lg py-3.5 pl-11 pr-11 text-black text-sm font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-gray-100'}`}
+                                        className={`w-full bg-gray-50/50 border rounded-lg py-3.5 pl-11 pr-11 text-black text-sm font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none ${error ? 'border-error' : 'border-primary/20'}`}
                                     />
                                     <button 
                                         type="button"
