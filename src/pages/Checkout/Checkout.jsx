@@ -255,22 +255,31 @@ const Checkout = () => {
             return;
         }
 
-        const groupedItems = checkoutItems.reduce((acc, item) => {
-            const IdRaw = item.productId?.Id;
-            const Id = (typeof IdRaw === 'object' ? IdRaw._id : IdRaw) || item.productId?._id;
-            if (!acc[Id]) acc[Id] = [];
-            acc[Id].push({
-                productInfo: item.productId,
+        // Group cart items by SUPPLIER (partnerId) — critical for wallet settlement
+        // Each group becomes one AuthOrder with the correct partnerId
+        const groupedByPartner = checkoutItems.reduce((acc, item) => {
+            const product = item.productId;
+            // Extract partnerId from the populated product (from cart API populate)
+            const partnerIdRaw = product?.partnerId;
+            const partnerId = (typeof partnerIdRaw === 'object' && partnerIdRaw?._id)
+                ? partnerIdRaw._id.toString()
+                : (partnerIdRaw?.toString() || product?._id?.toString() || 'unknown');
+
+            if (!acc[partnerId]) {
+                acc[partnerId] = { partnerId, items: [] };
+            }
+            acc[partnerId].items.push({
+                productInfo: product,
                 quantity: item.quantity,
                 size: item.size
             });
             return acc;
         }, {});
 
-        const formattedProducts = Object.keys(groupedItems).map(Id => ({
-            Id,
-            products: groupedItems[Id],
-            price: groupedItems[Id].reduce((sum, i) => sum + (getTieredPrice(i.productInfo, i.quantity) * i.quantity), 0)
+        const formattedProducts = Object.values(groupedByPartner).map(group => ({
+            partnerId: group.partnerId,   // ← explicitly pass partnerId to backend
+            products: group.items,
+            price: group.items.reduce((sum, i) => sum + (getTieredPrice(i.productInfo, i.quantity) * i.quantity), 0)
         }));
 
         const orderData = {

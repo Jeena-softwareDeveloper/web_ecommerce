@@ -80,7 +80,7 @@ const MainLayout = () => {
         <SupplierHeader />
 
         {/* CONTAINER CONTENT */}
-        <div className="w-full flex-grow lg:p-8 lg:h-auto h-auto bg-gray-200 lg:bg-transparent max-w-md mx-auto border-x border-gray-100 lg:max-w-none lg:border-0 lg:p-0 flex flex-col lg:overflow-visible overflow-visible relative">
+        <div className="w-full flex-grow lg:p-4 lg:h-auto h-auto bg-gray-200 lg:bg-transparent max-w-md mx-auto border-x border-gray-100 lg:max-w-none lg:border-0 flex flex-col lg:overflow-visible overflow-visible relative">
             <Outlet />
           </div>
       

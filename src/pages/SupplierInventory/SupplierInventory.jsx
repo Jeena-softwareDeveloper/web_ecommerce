@@ -326,6 +326,7 @@ const SupplierInventory = () => {
                 subProducts={subProducts}
                 isLoading={fetchingIds[catalogId]}
                 actions={subActions}
+                onRowClick={(sub) => setSelectedProductVariants(sub)}
             />
         );
     };
@@ -340,6 +341,10 @@ const SupplierInventory = () => {
             <InventoryHeader 
                 activeCount={activeCount}
                 totalStylesCount={myCatalogs?.length || 0}
+                lowStockCount={lowStockCount}
+                deadStockCount={deadStockCount}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 onScanClick={() => setIsScanModalOpen(true)}
@@ -896,101 +901,200 @@ const SupplierInventory = () => {
                 )}
             </AnimatePresence>
 
-            {/* SIZES, STOCK & PRICES BOTTOM SHEET MODAL */}
+            {/* SIZES, STOCK & PRICES RIGHT SIDEBAR DRAWER */}
             <AnimatePresence>
                 {selectedProductVariants && (
-                    <motion.div 
-                        initial={{ opacity: 0 }} 
-                        animate={{ opacity: 1 }} 
-                        exit={{ opacity: 0 }} 
-                        className="fixed inset-0 bg-black/60 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4"
-                        onClick={() => setSelectedProductVariants(null)}
-                    >
-                        <motion.div 
-                            initial={{ y: "100%", opacity: 0 }} 
-                            animate={{ y: 0, opacity: 1 }} 
-                            exit={{ y: "100%", opacity: 0 }} 
-                            transition={{ type: "spring", damping: 25, stiffness: 250 }}
-                            className="bg-white rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl relative w-full sm:max-w-lg border border-gray-100 max-h-[80vh] sm:max-h-[85vh] flex flex-col"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {/* Drag Indicator for Mobile */}
-                            <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-4 sm:hidden shrink-0" />
+                    <div className="fixed inset-0 z-[150] overflow-hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+                        <div className="absolute inset-0 overflow-hidden">
+                            {/* Backdrop overlay */}
+                            <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity cursor-pointer" 
+                                onClick={() => setSelectedProductVariants(null)}
+                            />
 
-                            <button 
-                                onClick={() => setSelectedProductVariants(null)} 
-                                className="absolute top-6 right-6 p-2 bg-gray-50 border border-gray-200/50 rounded-xl text-gray-400 hover:text-gray-600 transition-colors"
-                            >
-                                <X size={18} />
-                            </button>
-                            
-                            <div className="flex items-start gap-4 mb-5 pr-8 shrink-0">
-                                <img 
-                                    src={selectedProductVariants.images?.[0] || ''} 
-                                    alt="" 
-                                    className="w-14 h-18 rounded-xl object-cover border border-gray-100 bg-gray-50"
-                                />
-                                <div className="min-w-0">
-                                    <h3 className="text-sm font-black text-gray-900 leading-snug">
-                                        {selectedProductVariants.productName}
-                                    </h3>
-                                    <p className="text-[10px] text-gray-400 font-extrabold uppercase mt-1">
-                                        Category: {selectedProductVariants.category} • {selectedProductVariants.subCategory}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-3 shrink-0">Size Breakdown & Stock</p>
-
-                            <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-                                {selectedProductVariants.variants?.length > 0 ? (
-                                    selectedProductVariants.variants.map((v, i) => {
-                                        const isAvailable = (v.stock || 0) > 0;
-                                        return (
-                                            <div 
-                                                key={v._id || i}
-                                                className="bg-gray-50/50 border border-gray-150 rounded-2xl p-4 flex items-center justify-between gap-4"
+                            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                                <motion.div 
+                                    initial={{ x: "100%" }}
+                                    animate={{ x: 0 }}
+                                    exit={{ x: "100%" }}
+                                    transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                                    className="pointer-events-auto w-screen max-w-md"
+                                >
+                                    <div className="flex h-full flex-col bg-white shadow-2xl border-l border-gray-150/50">
+                                        
+                                        {/* Drawer Header */}
+                                        <div className="px-6 py-6 border-b border-gray-100 bg-gray-50/50 relative shrink-0">
+                                            <button 
+                                                onClick={() => setSelectedProductVariants(null)} 
+                                                className="absolute top-6 right-6 p-2 bg-white border border-gray-200/50 rounded-xl text-gray-400 hover:text-gray-600 hover:scale-105 active:scale-95 transition-all shadow-xs"
                                             >
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700 font-extrabold text-xs">
-                                                        {v.size}
-                                                    </div>
-                                                    <div>
-                                                        <div className="flex items-center gap-1.5">
-                                                            <span className="text-xs font-bold text-gray-500">Stock:</span>
-                                                            <span className={`text-xs font-black ${isAvailable ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                                                {v.stock || 0}
-                                                            </span>
-                                                        </div>
-                                                        {v.skuId && (
-                                                            <p className="text-[9px] font-mono text-gray-400 mt-0.5">
-                                                                SKU: {v.skuId}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                </div>
+                                                <X size={18} />
+                                            </button>
 
-                                                <div className="text-right">
-                                                    <div className="text-sm font-black text-gray-900">
-                                                        ₹{v.listingPrice}
-                                                    </div>
-                                                    {v.mrp > v.listingPrice && (
-                                                        <div className="text-[10px] text-gray-400 line-through">
-                                                            MRP ₹{v.mrp}
-                                                        </div>
-                                                    )}
+                                            <div className="flex items-start gap-4 pr-10">
+                                                <img 
+                                                    src={selectedProductVariants.images?.[0] || ''} 
+                                                    alt="" 
+                                                    className="w-16 h-20 rounded-xl object-cover border border-gray-100 bg-gray-50 shadow-sm"
+                                                />
+                                                <div className="min-w-0">
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase border border-purple-100 bg-purple-50 text-purple-700 mb-2">
+                                                        <Layers size={9} />
+                                                        {selectedProductVariants.variants?.[0]?.color || selectedProductVariants.productName}
+                                                    </span>
+                                                    <h3 className="text-sm font-black text-gray-900 leading-tight line-clamp-2">
+                                                        {selectedProductVariants.productName}
+                                                    </h3>
+                                                    <p className="text-[10px] text-gray-400 font-extrabold uppercase mt-1">
+                                                        {selectedProductVariants.category} • {selectedProductVariants.subCategory}
+                                                    </p>
                                                 </div>
                                             </div>
-                                        );
-                                    })
-                                ) : (
-                                    <div className="text-center py-6 text-xs text-gray-400 font-bold">
-                                        No variants/sizes found for this style.
+                                        </div>
+
+                                        {/* Drawer Content */}
+                                        <div className="flex-1 overflow-y-auto px-6 py-6">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest pl-1">Size Breakdown & Stock</p>
+                                                <span className="bg-purple-100/50 text-purple-700 text-[10px] px-2.5 py-0.5 rounded-full font-black uppercase">
+                                                    Total Stock: {selectedProductVariants.variants?.reduce((acc, v) => acc + (v.stock || 0), 0) || 0}
+                                                </span>
+                                            </div>
+
+                                            <div className="space-y-3.5">
+                                                {selectedProductVariants.variants?.length > 0 ? (
+                                                    selectedProductVariants.variants.map((v, i) => {
+                                                        const total = v.stock || 0;
+                                                        const reserved = v.reservedStock || 0;
+                                                        const available = Math.max(0, total - reserved);
+                                                        const isAvailable = available > 0;
+                                                        
+                                                        return (
+                                                            <div 
+                                                                key={v._id || i}
+                                                                className="bg-white border border-gray-200/70 hover:border-purple-200 rounded-2xl p-4 flex flex-col gap-3 shadow-xs transition-all"
+                                                            >
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700 font-extrabold text-xs">
+                                                                            {v.size}
+                                                                        </div>
+                                                                        <div>
+                                                                            <div className="flex items-center gap-1.5">
+                                                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                                                                    isAvailable ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                                                                                }`}>
+                                                                                    {isAvailable ? 'In Stock' : 'Out of Stock'}
+                                                                                </span>
+                                                                            </div>
+                                                                            {v.skuId && (
+                                                                                <p className="text-[9px] font-mono text-gray-400 mt-1">
+                                                                                    SKU: {v.skuId}
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="text-right">
+                                                                        <div className="text-sm font-black text-gray-900">
+                                                                            ₹{v.listingPrice}
+                                                                        </div>
+                                                                        {v.mrp > v.listingPrice && (
+                                                                            <div className="text-[10px] text-gray-400 line-through">
+                                                                                MRP ₹{v.mrp}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Stock Breakdown Progress Bar */}
+                                                                <div className="pt-2 border-t border-gray-100/60 mt-1">
+                                                                    <div className="flex justify-between text-[10px] font-bold text-gray-500 mb-1.5">
+                                                                        <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Available: {available} pcs</span>
+                                                                        <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Reserved: {reserved} pcs</span>
+                                                                    </div>
+                                                                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden flex">
+                                                                        {total > 0 ? (
+                                                                            <>
+                                                                                <div 
+                                                                                    style={{ width: `${(available / total) * 100}%` }} 
+                                                                                    className="h-full bg-emerald-500 transition-all"
+                                                                                />
+                                                                                <div 
+                                                                                    style={{ width: `${(reserved / total) * 100}%` }} 
+                                                                                    className="h-full bg-amber-500 transition-all"
+                                                                                />
+                                                                            </>
+                                                                        ) : (
+                                                                            <div className="w-full h-full bg-gray-200" />
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })
+                                                ) : (
+                                                    <div className="text-center py-10 text-xs text-gray-400 font-bold">
+                                                        No variants/sizes found for this style.
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Drawer Footer Actions */}
+                                        <div className="border-t border-gray-100 bg-gray-50/50 px-6 py-6 space-y-3 shrink-0">
+                                            <div className="flex gap-3">
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedProductVariants(null);
+                                                        handleOpenBarcode(selectedProductVariants);
+                                                    }}
+                                                    className="flex-1 bg-white border border-gray-200 text-gray-600 hover:text-purple-600 hover:border-purple-200 font-black text-xs uppercase py-3.5 rounded-xl shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                                                >
+                                                    <BarcodeIcon size={14} />
+                                                    <span>View Barcode</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedProductVariants(null);
+                                                        navigate('/catalog-upload', { state: { editCatalogId: selectedProductVariants.catalogId || selectedProductVariants._id } });
+                                                    }}
+                                                    className="flex-1 bg-purple-600 text-white font-black text-xs uppercase py-3.5 rounded-xl shadow-md shadow-purple-600/10 hover:bg-purple-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                                                >
+                                                    <Pencil size={12} />
+                                                    <span>Edit Style</span>
+                                                </button>
+                                            </div>
+                                            
+                                            <div className="flex gap-3">
+                                                <button 
+                                                    onClick={() => {
+                                                        toggleStatus(selectedProductVariants._id, selectedProductVariants.status);
+                                                        setSelectedProductVariants(prev => ({
+                                                            ...prev,
+                                                            status: prev.status === 'active' ? 'inactive' : 'active'
+                                                        }));
+                                                    }}
+                                                    className={`w-full py-3 rounded-xl text-xs font-black uppercase border active:scale-95 transition-all cursor-pointer ${
+                                                        selectedProductVariants.status === 'active' 
+                                                            ? 'bg-rose-50 border-rose-100 text-rose-600 hover:bg-rose-100' 
+                                                            : 'bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-100'
+                                                    }`}
+                                                >
+                                                    {selectedProductVariants.status === 'active' ? 'Disable Style (Go Offline)' : 'Enable Style (Go Live)'}
+                                                </button>
+                                            </div>
+                                        </div>
+
                                     </div>
-                                )}
+                                </motion.div>
                             </div>
-                        </motion.div>
-                    </motion.div>
+                        </div>
+                    </div>
                 )}
             </AnimatePresence>
 

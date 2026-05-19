@@ -8,7 +8,7 @@ import React from 'react';
  * - isLoading: boolean — shows skeleton while fetching
  * - actions: array of { icon, title, onClick, colorClass } — action buttons per row
  */
-const VariantSubTable = ({ subProducts = [], isLoading = false, actions = [] }) => {
+const VariantSubTable = ({ subProducts = [], isLoading = false, actions = [], onRowClick = null }) => {
 
     if (isLoading) {
         return (
@@ -61,7 +61,11 @@ const VariantSubTable = ({ subProducts = [], isLoading = false, actions = [] }) 
                         const reorder  = subProduct.variants?.[0]?.reorderLevel || 5;
 
                         return (
-                            <tr key={subProduct._id} className="hover:bg-gray-50/70 transition-colors">
+                            <tr 
+                                key={subProduct._id} 
+                                onClick={() => onRowClick && onRowClick(subProduct)}
+                                className="hover:bg-gray-50/70 transition-colors cursor-pointer"
+                            >
 
                                 {/* Swatch image */}
                                 <td className="px-4 py-2.5">

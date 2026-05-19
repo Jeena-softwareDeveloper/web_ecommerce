@@ -1228,20 +1228,47 @@ const SupplierCatalogUpload = () => {
             {/* ── EDIT CONFIRM MODAL ── */}
             <AnimatePresence>
                 {showConfirmModal && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed lg:absolute inset-0 z-[200] flex items-end lg:items-center justify-center bg-black/40 backdrop-blur-sm">
-                        <motion.div initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} className="bg-white rounded-t-3xl lg:rounded-3xl w-full max-w-md lg:max-w-lg p-6 shadow-2xl">
-                            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <AlertCircle size={22} className="text-amber-600" />
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }} 
+                        className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.95, y: 20, opacity: 0 }} 
+                            animate={{ scale: 1, y: 0, opacity: 1 }} 
+                            exit={{ scale: 0.95, y: 20, opacity: 0 }} 
+                            transition={{ type: 'spring', duration: 0.4 }}
+                            className="bg-white border border-gray-100 rounded-3xl w-full max-w-md p-6 lg:p-8 shadow-2xl flex flex-col items-center text-center relative overflow-hidden"
+                        >
+                            {/* Decorative background glow */}
+                            <div className="absolute -top-10 -left-10 w-24 h-24 bg-amber-400/10 rounded-full blur-xl pointer-events-none" />
+                            <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-violet-500/10 rounded-full blur-xl pointer-events-none" />
+
+                            {/* Warning icon */}
+                            <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mb-5 ring-8 ring-amber-50/50 transition-all duration-300">
+                                <AlertCircle size={28} className="text-amber-500" />
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900 text-center mb-2">Re-submit for Review?</h3>
-                            <p className="text-sm text-gray-500 text-center leading-relaxed mb-6">
-                                Your catalog will be marked as <span className="font-bold text-amber-600">Pending</span> and hidden from customers until our team approves it again.
+
+                            {/* Text */}
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Re-submit for Review?</h3>
+                            <p className="text-sm text-gray-500 leading-relaxed mb-6 max-w-sm">
+                                Your catalog will be marked as <span className="font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">Pending</span> and hidden from customers until our team approves it again.
                             </p>
-                            <div className="flex gap-3">
-                                <button onClick={() => setShowConfirmModal(false)} className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-semibold text-gray-600 text-sm hover:bg-gray-50 transition-colors">
+
+                            {/* Buttons */}
+                            <div className="flex gap-3 w-full">
+                                <button 
+                                    onClick={() => setShowConfirmModal(false)} 
+                                    className="flex-1 py-3 border border-gray-200 rounded-xl font-semibold text-gray-600 text-xs sm:text-sm hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98] transition-all"
+                                >
                                     Go Back
                                 </button>
-                                <button onClick={handleEditSubmit} disabled={!!submitLoading} className="flex-1 py-3 bg-violet-600 rounded-xl font-bold text-white text-sm shadow-md disabled:opacity-60 hover:bg-violet-700 transition-colors">
+                                <button 
+                                    onClick={handleEditSubmit} 
+                                    disabled={!!submitLoading} 
+                                    className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 active:scale-[0.98] rounded-xl font-bold text-white text-xs sm:text-sm shadow-md shadow-purple-600/10 transition-all flex items-center justify-center gap-1.5"
+                                >
                                     {submitLoading ? 'Submitting…' : 'Yes, Submit'}
                                 </button>
                             </div>

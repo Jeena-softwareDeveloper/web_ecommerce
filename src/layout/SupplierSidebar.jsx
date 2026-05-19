@@ -14,8 +14,7 @@ import {
   Store, 
   Star, 
   HelpCircle,
-  ShoppingBag,
-  Layers
+  ShoppingBag
 } from 'lucide-react';
 
 const SupplierSidebar = () => {
@@ -31,7 +30,6 @@ const SupplierSidebar = () => {
       title: "Manage Business",
       items: [
         { name: "Inventory", icon: Package, color: "text-red-400", path: "/supplier-inventory" },
-        { name: "ERP Stock", icon: Layers, color: "text-blue-400", path: "/supplier-stock" },
         { name: "Orders", icon: ShoppingBag, color: "text-purple-400", path: "/supplier-orders" },
         { name: "Returns", icon: RefreshCw, color: "text-pink-400", path: "/supplier-returns" },
         { name: "Payments", icon: Wallet, color: "text-green-400", path: "/supplier-payments" },
