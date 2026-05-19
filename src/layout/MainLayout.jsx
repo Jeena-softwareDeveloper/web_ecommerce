@@ -74,7 +74,7 @@ const MainLayout = () => {
       <SupplierSidebar />
 
       {/* CONTENT AREA WRAPPER */}
-      <div className="flex-grow h-screen overflow-y-auto bg-gray-50 flex flex-col relative w-full lg:transform lg:translate-3d-0 lg:will-change-transform lg:overflow-x-hidden">
+      <div className="flex-grow h-screen overflow-y-auto bg-gray-50 flex flex-col relative w-full lg:overflow-x-hidden">
         
         {/* DESKTOP HEADER */}
         <SupplierHeader />

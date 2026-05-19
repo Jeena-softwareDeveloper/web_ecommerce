@@ -100,7 +100,7 @@ const PricingBreakdown = ({ basePrice, gstPct, mrp, isBulkOnly }) => {
                     </p>
                 </div>
             )}
-            <div className="flex divide-x divide-gray-200">
+            <div className="flex flex-wrap divide-y lg:divide-y-0 lg:divide-x divide-gray-200">
                 <div className="flex-1 px-3 py-2.5 text-center">
                     <p className="text-xs text-gray-500 font-medium mb-0.5">Base Price</p>
                     <p className="text-base font-bold text-gray-800">₹{base.toFixed(2)}</p>
@@ -434,6 +434,32 @@ const SupplierCatalogUpload = () => {
         return Object.keys(e).length === 0;
     };
 
+    // Sync step changes with the global SupplierHeader
+    useEffect(() => {
+        window.dispatchEvent(new CustomEvent('catalog-upload-step-changed', { detail: step }));
+    }, [step]);
+
+    // Handle requests from the global SupplierHeader to change step
+    useEffect(() => {
+        const handleStepChangeRequest = (e) => {
+            const targetStep = e.detail;
+            if (targetStep === 1) {
+                setStep(1);
+            } else if (targetStep === 2) {
+                if (validateStep()) {
+                    setStep(2);
+                } else {
+                    // Re-dispatch step 1 to header to sync back if validation fails
+                    window.dispatchEvent(new CustomEvent('catalog-upload-step-changed', { detail: 1 }));
+                }
+            }
+        };
+        window.addEventListener('request-catalog-upload-step-change', handleStepChangeRequest);
+        return () => {
+            window.removeEventListener('request-catalog-upload-step-change', handleStepChangeRequest);
+        };
+    }, [catalogInfo, products]);
+
     /* ── submit ── */
     const buildPayload = () => {
         const gstM = 1 + parseInt(catalogInfo.gstPercentage || 5) / 100;
@@ -504,7 +530,7 @@ const SupplierCatalogUpload = () => {
        RENDER
     ═══════════════════════════════════════════ */
     return (
-        <>
+        <div className="relative h-[100dvh] lg:h-[calc(100vh-73px)]  flex flex-col overflow-hidden">
             {/* FETCH LOADING */}
             {fetchLoading && (
                 <div className="fixed inset-0 z-[300] bg-white flex flex-col items-center justify-center gap-4">
@@ -513,8 +539,8 @@ const SupplierCatalogUpload = () => {
                 </div>
             )}
 
-            {/* ── HEADER ── */}
-            <div className="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-100 flex items-center justify-between px-4 z-50 max-w-md mx-auto">
+            {/* ── HEADER (Mobile) ── */}
+            <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-100 flex items-center justify-between px-4 z-50 max-w-md mx-auto">
                 <div className="flex items-center gap-3">
                     <button onClick={() => step > 1 ? setStep(s => s - 1) : navigate('/supplier-inventory')} className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors">
                         <ChevronLeft size={22} className="text-gray-700" />
@@ -530,43 +556,65 @@ const SupplierCatalogUpload = () => {
                 </div>
                 <button className="text-violet-600 font-semibold text-sm">Help</button>
             </div>
-            <div className="h-14 w-full" />
+            <div className="lg:hidden h-14 w-full shrink-0" />
 
-            {/* ── STEPPER ── */}
-            <div className="sticky top-14 lg:top-0 z-40 bg-white border-b border-gray-100">
-                <div className="flex max-w-md lg:!max-w-[1000px] mx-auto">
-                    {[
-                        { id: 1, label: 'Catalog Info', icon: <Package size={15} /> },
-                        { id: 2, label: 'Add Products', icon: <Layers size={15} /> },
-                    ].map(s => (
-                        <button
-                            key={s.id}
-                            onClick={() => {
-                                if (s.id < step) setStep(s.id);
-                                else if (s.id === step + 1 && validateStep()) setStep(s.id);
-                            }}
-                            className="flex-1 flex flex-col items-center py-2.5 relative"
-                        >
-                            <div className={`w-7 h-7 rounded-full flex items-center justify-center mb-1 transition-colors ${step === s.id ? 'bg-violet-100 text-violet-700' : step > s.id ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
-                                {step > s.id ? <Check size={14} /> : s.icon}
-                            </div>
-                            <span className={`text-xs font-semibold transition-colors ${step === s.id ? 'text-violet-700' : step > s.id ? 'text-emerald-600' : 'text-gray-400'}`}>
-                                {s.label}
-                            </span>
-                            {step === s.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-600" />}
+            {/* ── DESKTOP HEADER (Hidden as global header is used) ── */}
+            <div className="hidden">
+                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <button onClick={() => navigate('/supplier-inventory')} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                            <ChevronLeft size={20} />
                         </button>
-                    ))}
+                        <h1 className="text-xl font-bold text-gray-900">
+                            {isEditMode ? 'Edit Catalog' : 'Create New Catalog'}
+                        </h1>
+                        {isEditMode && catalogInfo.status && (
+                            <Badge color={catalogInfo.status === 'active' ? 'green' : catalogInfo.status === 'pending' ? 'amber' : 'red'}>
+                                {catalogInfo.status === 'active' ? 'Live' : catalogInfo.status}
+                            </Badge>
+                        )}
+                    </div>
+                    <button className="text-violet-600 font-semibold text-sm">Help & Support</button>
                 </div>
             </div>
 
-            {/* ── MAIN CONTENT ── */}
-            <div className="flex-1 pb-24 overflow-y-auto max-w-md lg:!max-w-[1000px] mx-auto w-full lg:bg-white lg:shadow-sm lg:rounded-2xl lg:p-6 lg:my-6">
+            {/* ── STEPPER (Responsive) ── */}
+            <div className="bg-white border-b border-gray-100 shadow-sm shrink-0 w-full z-20 lg:hidden">
+                <div className="max-w-7xl mx-auto px-4 lg:px-6">
+                    <div className="flex max-w-md lg:max-w-none mx-auto">
+                        {[
+                            { id: 1, label: 'Catalog Info', icon: <Package size={15} /> },
+                            { id: 2, label: 'Add Products', icon: <Layers size={15} /> },
+                        ].map(s => (
+                            <button
+                                key={s.id}
+                                onClick={() => {
+                                    if (s.id < step) setStep(s.id);
+                                    else if (s.id === step + 1 && validateStep()) setStep(s.id);
+                                }}
+                                className="flex-1 flex flex-col items-center py-2.5 relative"
+                            >
+                                <div className={`w-7 h-7 rounded-full flex items-center justify-center mb-1 transition-colors ${step === s.id ? 'bg-violet-100 text-violet-700' : step > s.id ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
+                                    {step > s.id ? <Check size={14} /> : s.icon}
+                                </div>
+                                <span className={`text-xs font-semibold transition-colors ${step === s.id ? 'text-violet-700' : step > s.id ? 'text-emerald-600' : 'text-gray-400'}`}>
+                                    {s.label}
+                                </span>
+                                {step === s.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-600" />}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* ── MAIN CONTENT (Responsive Width & Padding) ── */}
+            <div className="flex-grow overflow-y-auto no-scrollbar w-full">
+                <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4 lg:py-8">
                 <AnimatePresence mode="wait">
 
                     {/* ══ STEP 1 ══ */}
                     {step === 1 && (
-                        <motion.div key="step1" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="p-4 space-y-5">
-
+                        <motion.div key="step1" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6 max-w-3xl mx-auto">
                             {/* Catalog Name */}
                             <div>
                                 <Label required>Catalog Name</Label>
@@ -613,7 +661,7 @@ const SupplierCatalogUpload = () => {
                             </div>
 
                             {/* HSN + GST row */}
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <Label>HSN Code</Label>
                                     <FieldBox>
@@ -673,382 +721,381 @@ const SupplierCatalogUpload = () => {
                         </motion.div>
                     )}
 
-                    {/* ══ STEP 2 ══ */}
+                    {/* ══ STEP 2 (Responsive Grid) ══ */}
                     {step === 2 && (
-                        <motion.div key="step2" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-3 pt-3">
+                        <motion.div key="step2" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-4">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                {products.map((prod, pIdx) => {
+                                    const isExpanded = expandedVariantId === prod.id;
+                                    const accentColors = [
+                                        { border: 'border-blue-200', bg: 'bg-blue-50', badge: 'bg-blue-100 text-blue-700', header: 'text-blue-800' },
+                                        { border: 'border-rose-200', bg: 'bg-rose-50', badge: 'bg-rose-100 text-rose-700', header: 'text-rose-800' },
+                                        { border: 'border-emerald-200', bg: 'bg-emerald-50', badge: 'bg-emerald-100 text-emerald-700', header: 'text-emerald-800' },
+                                        { border: 'border-amber-200', bg: 'bg-amber-50', badge: 'bg-amber-100 text-amber-700', header: 'text-amber-800' },
+                                    ];
+                                    const ac = accentColors[pIdx % accentColors.length];
 
-                            {products.map((prod, pIdx) => {
-                                const isExpanded = expandedVariantId === prod.id;
-                                const accentColors = [
-                                    { border: 'border-blue-200', bg: 'bg-blue-50', badge: 'bg-blue-100 text-blue-700', header: 'text-blue-800' },
-                                    { border: 'border-rose-200', bg: 'bg-rose-50', badge: 'bg-rose-100 text-rose-700', header: 'text-rose-800' },
-                                    { border: 'border-emerald-200', bg: 'bg-emerald-50', badge: 'bg-emerald-100 text-emerald-700', header: 'text-emerald-800' },
-                                    { border: 'border-amber-200', bg: 'bg-amber-50', badge: 'bg-amber-100 text-amber-700', header: 'text-amber-800' },
-                                ];
-                                const ac = accentColors[pIdx % accentColors.length];
-
-                                return (
-                                    <div key={prod.id} className={`border-2 ${ac.border} ${ac.bg} rounded-2xl overflow-hidden mx-3`}>
-                                        {/* Accordion Header */}
-                                        <div
-                                            onClick={() => setExpandedVariantId(isExpanded ? null : prod.id)}
-                                            className="flex items-center justify-between px-4 py-3.5 cursor-pointer hover:bg-white/40 transition-colors"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${ac.badge}`}>
-                                                    {pIdx + 1}
+                                    return (
+                                        <div key={prod.id} className={`border-2 ${ac.border} ${ac.bg} rounded-2xl overflow-hidden transition-all hover:shadow-md`}>
+                                            {/* Accordion Header */}
+                                            <div
+                                                onClick={() => setExpandedVariantId(isExpanded ? null : prod.id)}
+                                                className="flex items-center justify-between px-4 py-3.5 cursor-pointer hover:bg-white/40 transition-colors"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${ac.badge}`}>
+                                                        {pIdx + 1}
+                                                    </div>
+                                                    <div>
+                                                        <p className={`font-semibold text-sm ${ac.header}`}>
+                                                            {prod.variantName || `Variant ${pIdx + 1}`}
+                                                        </p>
+                                                        {!isExpanded && (
+                                                            <p className="text-xs text-gray-500">{prod.images.length} photo{prod.images.length !== 1 ? 's' : ''} · {prod.variants.length} size{prod.variants.length !== 1 ? 's' : ''}</p>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className={`font-semibold text-sm ${ac.header}`}>
-                                                        {prod.variantName || `Variant ${pIdx + 1}`}
-                                                    </p>
-                                                    {!isExpanded && (
-                                                        <p className="text-xs text-gray-500">{prod.images.length} photo{prod.images.length !== 1 ? 's' : ''} · {prod.variants.length} size{prod.variants.length !== 1 ? 's' : ''}</p>
+                                                <div className="flex items-center gap-2">
+                                                    {products.length > 1 && (
+                                                        <button
+                                                            onClick={e => { e.stopPropagation(); setProducts(prev => prev.filter((_, i) => i !== pIdx)); }}
+                                                            className="w-8 h-8 flex items-center justify-center text-red-400 hover:bg-red-50 rounded-lg transition-colors"
+                                                        >
+                                                            <Trash2 size={15} />
+                                                        </button>
                                                     )}
+                                                    <ChevronDown size={18} className={`text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                {products.length > 1 && (
-                                                    <button
-                                                        onClick={e => { e.stopPropagation(); setProducts(prev => prev.filter((_, i) => i !== pIdx)); }}
-                                                        className="w-8 h-8 flex items-center justify-center text-red-400 hover:bg-red-50 rounded-lg transition-colors"
+
+                                            {/* Accordion Body */}
+                                            <AnimatePresence>
+                                                {isExpanded && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: 'auto', opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        className="bg-white/70 backdrop-blur-sm"
                                                     >
-                                                        <Trash2 size={15} />
-                                                    </button>
-                                                )}
-                                                <ChevronDown size={18} className={`text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-                                            </div>
-                                        </div>
+                                                        <div className="p-4 space-y-5 max-h-[580px] overflow-y-auto variant-scrollbar">
 
-                                        {/* Accordion Body */}
-                                        <AnimatePresence>
-                                            {isExpanded && (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: 'auto', opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    className="bg-white/70 backdrop-blur-sm"
-                                                >
-                                                    <div className="p-4 space-y-5 max-h-[580px] overflow-y-auto variant-scrollbar">
-
-                                                        {/* Variant Name */}
-                                                        <div>
-                                                            <Label required={products.length > 1}>Variant Name / Color</Label>
-                                                            <FieldBox error={errors[`color_${prod.id}`]}>
-                                                                <input
-                                                                    placeholder="e.g. Royal Blue, Full Sleeve"
-                                                                    value={prod.variantName}
-                                                                    onChange={e => updateProduct(pIdx, p => { p.variantName = e.target.value; })}
-                                                                    className="w-full px-4 py-3 text-sm font-medium text-gray-800 placeholder-gray-400 bg-transparent outline-none rounded-xl"
-                                                                />
-                                                            </FieldBox>
-                                                        </div>
-
-                                                        {/* Images */}
-                                                        <div>
-                                                            <div className="flex items-center justify-between mb-2">
-                                                                <Label required>Product Photos</Label>
-                                                                <span className="text-xs text-gray-400">{prod.images.length}/12</span>
-                                                            </div>
-                                                            <div className={`grid grid-cols-4 gap-2 p-2 rounded-xl transition-all ${errors[`img_${prod.id}`] ? 'bg-red-50 ring-2 ring-red-200' : ''}`}>
-                                                                {prod.images.map((img, iIdx) => (
-                                                                    <div key={iIdx} className={`aspect-[3/4] rounded-xl overflow-hidden relative border-2 transition-all ${prod.primaryImageIndex === iIdx ? 'border-violet-500 shadow-md' : 'border-transparent'}`}>
-                                                                        <img src={img} alt="" className="w-full h-full object-cover" />
-                                                                        <button
-                                                                            onClick={() => updateProduct(pIdx, p => { p.primaryImageIndex = iIdx; })}
-                                                                            className={`absolute bottom-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase shadow ${prod.primaryImageIndex === iIdx ? 'bg-violet-600 text-white' : 'bg-white/90 text-gray-600 hover:bg-white'}`}
-                                                                        >
-                                                                            {prod.primaryImageIndex === iIdx ? 'Main' : 'Set'}
-                                                                        </button>
-                                                                        <button
-                                                                            onClick={() => updateProduct(pIdx, p => {
-                                                                                p.images.splice(iIdx, 1);
-                                                                                if (p.primaryImageIndex === iIdx) p.primaryImageIndex = 0;
-                                                                                else if (p.primaryImageIndex > iIdx) p.primaryImageIndex -= 1;
-                                                                            })}
-                                                                            className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-md shadow"
-                                                                        >
-                                                                            <X size={10} strokeWidth={3} />
-                                                                        </button>
-                                                                    </div>
-                                                                ))}
-                                                                {prod.images.length < 12 && (
-                                                                    <label className="aspect-[3/4] border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-violet-400 hover:bg-violet-50 transition-all">
-                                                                        <ImageIcon size={20} className="text-gray-300" />
-                                                                        <span className="text-[10px] font-semibold text-gray-400 mt-1">Add Photo</span>
-                                                                        <input type="file" multiple accept="image/*" onChange={e => handleImageUpload(pIdx, e)} className="hidden" />
-                                                                    </label>
-                                                                )}
-                                                            </div>
-                                                            {errors[`img_${prod.id}`] && <p className="text-xs text-red-500 mt-1 font-medium">Please add at least one photo.</p>}
-                                                        </div>
-
-                                                        {/* Size Variations */}
-                                                        <div>
-                                                            <div className="flex items-center justify-between mb-2">
-                                                                <Label required>Sizes & Pricing</Label>
-                                                                <button
-                                                                    onClick={() => updateProduct(pIdx, p => { p.variants.push({ size: '', listingPrice: '', mrp: '', stock: '', skuId: generateSKU(), priceTiers: [] }); })}
-                                                                    className="flex items-center gap-1 text-xs font-semibold text-violet-600 hover:text-violet-800"
-                                                                >
-                                                                    <Plus size={13} /> Add Size
-                                                                </button>
+                                                            {/* Variant Name */}
+                                                            <div>
+                                                                <Label required={products.length > 1}>Variant Name / Color</Label>
+                                                                <FieldBox error={errors[`color_${prod.id}`]}>
+                                                                    <input
+                                                                        placeholder="e.g. Royal Blue, Full Sleeve"
+                                                                        value={prod.variantName}
+                                                                        onChange={e => updateProduct(pIdx, p => { p.variantName = e.target.value; })}
+                                                                        className="w-full px-4 py-3 text-sm font-medium text-gray-800 placeholder-gray-400 bg-transparent outline-none rounded-xl"
+                                                                    />
+                                                                </FieldBox>
                                                             </div>
 
-                                                            {/* Quick size pills */}
-                                                            <div className="flex flex-wrap gap-2 mb-3">
-                                                                {['S', 'M', 'L', 'XL', 'XXL', 'Free Size'].map(sz => {
-                                                                    const exists = prod.variants.some(v => v.size?.toUpperCase() === sz.toUpperCase());
-                                                                    return (
-                                                                        <Pill key={sz} active={exists} onClick={() => {
-                                                                            if (exists) return;
-                                                                            updateProduct(pIdx, p => {
-                                                                                if (p.variants.length === 1 && !p.variants[0].size) p.variants[0].size = sz;
-                                                                                else p.variants.push({ size: sz, listingPrice: p.variants[0].listingPrice, mrp: p.variants[0].mrp, stock: '', skuId: generateSKU(), priceTiers: [] });
-                                                                            });
-                                                                        }}>{sz}</Pill>
-                                                                    );
-                                                                })}
+                                                            {/* Images */}
+                                                            <div>
+                                                                <div className="flex items-center justify-between mb-2">
+                                                                    <Label required>Product Photos</Label>
+                                                                    <span className="text-xs text-gray-400">{prod.images.length}/12</span>
+                                                                </div>
+                                                                <div className={`grid grid-cols-3 sm:grid-cols-4 gap-2 p-2 rounded-xl transition-all ${errors[`img_${prod.id}`] ? 'bg-red-50 ring-2 ring-red-200' : ''}`}>
+                                                                    {prod.images.map((img, iIdx) => (
+                                                                        <div key={iIdx} className={`aspect-[3/4] rounded-xl overflow-hidden relative border-2 transition-all ${prod.primaryImageIndex === iIdx ? 'border-violet-500 shadow-md' : 'border-transparent'}`}>
+                                                                            <img src={img} alt="" className="w-full h-full object-cover" />
+                                                                            <button
+                                                                                onClick={() => updateProduct(pIdx, p => { p.primaryImageIndex = iIdx; })}
+                                                                                className={`absolute bottom-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase shadow ${prod.primaryImageIndex === iIdx ? 'bg-violet-600 text-white' : 'bg-white/90 text-gray-600 hover:bg-white'}`}
+                                                                            >
+                                                                                {prod.primaryImageIndex === iIdx ? 'Main' : 'Set'}
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => updateProduct(pIdx, p => {
+                                                                                    p.images.splice(iIdx, 1);
+                                                                                    if (p.primaryImageIndex === iIdx) p.primaryImageIndex = 0;
+                                                                                    else if (p.primaryImageIndex > iIdx) p.primaryImageIndex -= 1;
+                                                                                })}
+                                                                                className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-md shadow"
+                                                                            >
+                                                                                <X size={10} strokeWidth={3} />
+                                                                            </button>
+                                                                        </div>
+                                                                    ))}
+                                                                    {prod.images.length < 12 && (
+                                                                        <label className="aspect-[3/4] border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-violet-400 hover:bg-violet-50 transition-all">
+                                                                            <ImageIcon size={20} className="text-gray-300" />
+                                                                            <span className="text-[10px] font-semibold text-gray-400 mt-1">Add Photo</span>
+                                                                            <input type="file" multiple accept="image/*" onChange={e => handleImageUpload(pIdx, e)} className="hidden" />
+                                                                        </label>
+                                                                    )}
+                                                                </div>
+                                                                {errors[`img_${prod.id}`] && <p className="text-xs text-red-500 mt-1 font-medium">Please add at least one photo.</p>}
                                                             </div>
 
-                                                            <div className="space-y-3">
-                                                                {prod.variants.map((v, vIdx) => {
-                                                                    const key = `${prod.id}_${vIdx}`;
-                                                                    return (
-                                                                        <div key={vIdx} className="bg-white border-2 border-gray-100 rounded-xl p-4 shadow-sm">
-                                                                            {/* Size / Prices */}
-                                                                            <div className={`grid gap-3 mb-3 ${catalogInfo.isBulkOnly ? 'grid-cols-1' : 'grid-cols-3'}`}>
-                                                                                <div>
-                                                                                    <Label>Size</Label>
-                                                                                    <input
-                                                                                        placeholder="S / M / L…"
-                                                                                        value={v.size}
-                                                                                        onChange={e => updateVariant(pIdx, vIdx, va => { va.size = e.target.value; })}
-                                                                                        className={`w-full border-2 rounded-lg px-3 py-2 text-sm font-semibold text-center outline-none transition-all ${errors[`size_${key}`] ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50 focus:border-violet-500 focus:bg-white'}`}
-                                                                                    />
-                                                                                </div>
-                                                                                {!catalogInfo.isBulkOnly && (
-                                                                                    <>
-                                                                                        <div>
-                                                                                            <Label>Base Price (₹)</Label>
-                                                                                            <p className="text-[10px] text-gray-400 -mt-1 mb-1">Your selling price before GST</p>
-                                                                                            <div className="relative">
-                                                                                                <IndianRupee size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                                                                                                <input
-                                                                                                    type="number"
-                                                                                                    placeholder="440"
-                                                                                                    value={v.listingPrice}
-                                                                                                    onChange={e => updateVariant(pIdx, vIdx, va => { va.listingPrice = e.target.value; })}
-                                                                                                    className={`w-full border-2 rounded-lg pl-7 pr-3 py-2 text-sm font-semibold text-center outline-none transition-all ${errors[`price_${key}`] ? 'border-red-400 bg-red-50' : 'border-emerald-200 bg-emerald-50/30 focus:border-emerald-500 focus:bg-white text-emerald-800'}`}
-                                                                                                />
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div>
-                                                                                            <Label>MRP (₹)</Label>
-                                                                                            <p className="text-[10px] text-gray-400 -mt-1 mb-1">Customer pays this amount</p>
-                                                                                            <div className="relative">
-                                                                                                <IndianRupee size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                                                                                                <input
-                                                                                                    type="number"
-                                                                                                    placeholder="599"
-                                                                                                    value={v.mrp}
-                                                                                                    onChange={e => updateVariant(pIdx, vIdx, va => { va.mrp = e.target.value; })}
-                                                                                                    className={`w-full border-2 rounded-lg pl-7 pr-3 py-2 text-sm font-semibold text-center outline-none transition-all ${errors[`mrp_${key}`] ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50 focus:border-violet-500 focus:bg-white'}`}
-                                                                                                />
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </>
-                                                                                )}
-                                                                            </div>
+                                                            {/* Size Variations */}
+                                                            <div>
+                                                                <div className="flex items-center justify-between mb-2">
+                                                                    <Label required>Sizes & Pricing</Label>
+                                                                    <button
+                                                                        onClick={() => updateProduct(pIdx, p => { p.variants.push({ size: '', listingPrice: '', mrp: '', stock: '', skuId: generateSKU(), priceTiers: [] }); })}
+                                                                        className="flex items-center gap-1 text-xs font-semibold text-violet-600 hover:text-violet-800"
+                                                                    >
+                                                                        <Plus size={13} /> Add Size
+                                                                    </button>
+                                                                </div>
 
-                                                                            {/* Pricing Breakdown */}
-                                                                            {!catalogInfo.isBulkOnly && (
-                                                                                <PricingBreakdown
-                                                                                    basePrice={v.listingPrice}
-                                                                                    gstPct={catalogInfo.gstPercentage}
-                                                                                    mrp={v.mrp}
-                                                                                    isBulkOnly={catalogInfo.isBulkOnly}
-                                                                                />
-                                                                            )}
+                                                                {/* Quick size pills */}
+                                                                <div className="flex flex-wrap gap-2 mb-3">
+                                                                    {['S', 'M', 'L', 'XL', 'XXL', 'Free Size'].map(sz => {
+                                                                        const exists = prod.variants.some(v => v.size?.toUpperCase() === sz.toUpperCase());
+                                                                        return (
+                                                                            <Pill key={sz} active={exists} onClick={() => {
+                                                                                if (exists) return;
+                                                                                updateProduct(pIdx, p => {
+                                                                                    if (p.variants.length === 1 && !p.variants[0].size) p.variants[0].size = sz;
+                                                                                    else p.variants.push({ size: sz, listingPrice: p.variants[0].listingPrice, mrp: p.variants[0].mrp, stock: '', skuId: generateSKU(), priceTiers: [] });
+                                                                                });
+                                                                            }}>{sz}</Pill>
+                                                                        );
+                                                                    })}
+                                                                </div>
 
-
-
-                                                                            {/* SKU */}
-                                                                            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
-                                                                                <span className="text-xs text-gray-400 font-medium">SKU:</span>
-                                                                                <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
-                                                                                    {v.skuId || 'Auto-generated on save'}
-                                                                                </span>
-                                                                            </div>
-
-                                                                            {/* Bulk Pricing */}
-                                                                            <div className="mt-4 pt-4 border-t border-dashed border-gray-100">
-                                                                                <div className="flex items-center justify-between mb-2.5">
+                                                                <div className="space-y-3">
+                                                                    {prod.variants.map((v, vIdx) => {
+                                                                        const key = `${prod.id}_${vIdx}`;
+                                                                        return (
+                                                                            <div key={vIdx} className="bg-white border-2 border-gray-100 rounded-xl p-4 shadow-sm">
+                                                                                {/* Size / Prices */}
+                                                                                <div className={`grid gap-3 mb-3 ${catalogInfo.isBulkOnly ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-3'}`}>
                                                                                     <div>
-                                                                                        <p className="text-sm font-semibold text-gray-700">
-                                                                                            Bulk Pricing {catalogInfo.isBulkOnly ? <span className="text-red-500">*</span> : <span className="text-gray-400 font-normal text-xs">(optional)</span>}
-                                                                                        </p>
-                                                                                        <p className="text-xs text-gray-400">Discount for large quantity orders</p>
+                                                                                        <Label>Size</Label>
+                                                                                        <input
+                                                                                            placeholder="S / M / L…"
+                                                                                            value={v.size}
+                                                                                            onChange={e => updateVariant(pIdx, vIdx, va => { va.size = e.target.value; })}
+                                                                                            className={`w-full border-2 rounded-lg px-3 py-2 text-sm font-semibold text-center outline-none transition-all ${errors[`size_${key}`] ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50 focus:border-violet-500 focus:bg-white'}`}
+                                                                                        />
                                                                                     </div>
-                                                                                    <button
-                                                                                        onClick={() => updateVariant(pIdx, vIdx, va => { va.priceTiers.push({ minQty: '', price: '' }); })}
-                                                                                        className="flex items-center gap-1 text-xs font-semibold text-violet-600 bg-violet-50 px-3 py-1.5 rounded-lg hover:bg-violet-100 transition-colors"
-                                                                                    >
-                                                                                        <Plus size={12} /> Add Tier
-                                                                                    </button>
-                                                                                </div>
-
-                                                                                {v.priceTiers?.length > 0 ? (
-                                                                                    <div className="space-y-2">
-                                                                                        {v.priceTiers.map((tier, tIdx) => (
-                                                                                            <div key={tIdx} className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl p-3">
-                                                                                                <div className="flex items-center gap-1.5 flex-1">
-                                                                                                    <span className="text-xs text-gray-500 font-medium whitespace-nowrap">Min Qty</span>
+                                                                                    {!catalogInfo.isBulkOnly && (
+                                                                                        <>
+                                                                                            <div>
+                                                                                                <Label>Base Price (₹)</Label>
+                                                                                                <p className="text-[10px] text-gray-400 -mt-1 mb-1">Your selling price before GST</p>
+                                                                                                <div className="relative">
+                                                                                                    <IndianRupee size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
                                                                                                     <input
                                                                                                         type="number"
-                                                                                                        placeholder="10"
-                                                                                                        value={tier.minQty}
-                                                                                                        onChange={e => updateVariant(pIdx, vIdx, va => { va.priceTiers[tIdx].minQty = e.target.value; })}
-                                                                                                        className="w-14 border border-gray-200 rounded-lg p-1.5 text-center text-sm font-semibold bg-white outline-none"
-                                                                                                    />
-                                                                                                    <span className="text-xs text-gray-500 font-medium">Price ₹</span>
-                                                                                                    <input
-                                                                                                        type="number"
-                                                                                                        placeholder="390"
-                                                                                                        value={tier.price}
-                                                                                                        onChange={e => {
-                                                                                                            updateVariant(pIdx, vIdx, va => {
-                                                                                                                va.priceTiers[tIdx].price = e.target.value;
-                                                                                                                if (catalogInfo.isBulkOnly && tIdx === 0) va.listingPrice = e.target.value;
-                                                                                                            });
-                                                                                                        }}
-                                                                                                        className="flex-1 border border-gray-200 rounded-lg p-1.5 text-center text-sm font-semibold text-violet-700 bg-white outline-none"
+                                                                                                        placeholder="440"
+                                                                                                        value={v.listingPrice}
+                                                                                                        onChange={e => updateVariant(pIdx, vIdx, va => { va.listingPrice = e.target.value; })}
+                                                                                                        className={`w-full border-2 rounded-lg pl-7 pr-3 py-2 text-sm font-semibold text-center outline-none transition-all ${errors[`price_${key}`] ? 'border-red-400 bg-red-50' : 'border-emerald-200 bg-emerald-50/30 focus:border-emerald-500 focus:bg-white text-emerald-800'}`}
                                                                                                     />
                                                                                                 </div>
-                                                                                                {tier.price && (() => {
-                                                                                                    const p2 = parseFloat(tier.price) || 0;
-                                                                                                    const g = parseFloat(catalogInfo.gstPercentage || 5);
-                                                                                                    const payout = (p2 * (1 + g / 100)).toFixed(2);
-                                                                                                    return (
-                                                                                                        <div className="text-right shrink-0">
-                                                                                                            <p className="text-[10px] text-amber-600 font-semibold">+{g}% GST</p>
-                                                                                                            <p className="text-[10px] text-emerald-700 font-bold">₹{payout} payout</p>
-                                                                                                        </div>
-                                                                                                    );
-                                                                                                })()}
-                                                                                                <button
-                                                                                                    onClick={() => updateVariant(pIdx, vIdx, va => { va.priceTiers.splice(tIdx, 1); })}
-                                                                                                    className="text-gray-300 hover:text-red-400 p-1 transition-colors"
-                                                                                                >
-                                                                                                    <X size={14} />
-                                                                                                </button>
                                                                                             </div>
-                                                                                        ))}
-                                                                                    </div>
-                                                                                ) : (
-                                                                                    <p className="text-xs text-gray-400 italic">No bulk tiers added yet.</p>
-                                                                                )}
-                                                                            </div>
-
-                                                                            {/* Stock */}
-                                                                            <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <span className="text-sm font-semibold text-gray-700">Stock:</span>
-                                                                                    <input
-                                                                                        type="number"
-                                                                                        placeholder="0"
-                                                                                        value={v.stock}
-                                                                                        onChange={e => updateVariant(pIdx, vIdx, va => { va.stock = e.target.value; })}
-                                                                                        className={`w-20 border-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-center outline-none transition-all ${errors[`stock_${key}`] ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50 focus:border-violet-500 focus:bg-white'}`}
-                                                                                    />
-                                                                                    <span className="text-xs text-gray-400">units</span>
+                                                                                            <div>
+                                                                                                <Label>MRP (₹)</Label>
+                                                                                                <p className="text-[10px] text-gray-400 -mt-1 mb-1">Customer pays this amount</p>
+                                                                                                <div className="relative">
+                                                                                                    <IndianRupee size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                                                                    <input
+                                                                                                        type="number"
+                                                                                                        placeholder="599"
+                                                                                                        value={v.mrp}
+                                                                                                        onChange={e => updateVariant(pIdx, vIdx, va => { va.mrp = e.target.value; })}
+                                                                                                        className={`w-full border-2 rounded-lg pl-7 pr-3 py-2 text-sm font-semibold text-center outline-none transition-all ${errors[`mrp_${key}`] ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50 focus:border-violet-500 focus:bg-white'}`}
+                                                                                                    />
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </>
+                                                                                    )}
                                                                                 </div>
-                                                                                {prod.variants.length > 1 && (
-                                                                                    <button onClick={() => updateProduct(pIdx, p => { p.variants.splice(vIdx, 1); })} className="ml-auto text-red-400 hover:text-red-600 transition-colors">
-                                                                                        <Trash2 size={15} />
-                                                                                    </button>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        </div>
 
-                                                        {/* Specifications */}
-                                                        {selectedSpecs.length > 0 && (
-                                                            <div>
-                                                                <Label>Specifications</Label>
-                                                                <div className="space-y-3">
-                                                                    {selectedSpecs.map((spec, sIdx) => {
-                                                                        const specName = typeof spec === 'object' ? spec.name : spec;
-                                                                        const options = spec.options || [];
-                                                                        const currentMode = specModes[specName] || (options.length > 0 ? 'select' : 'type');
-                                                                        return (
-                                                                            <div key={sIdx}>
-                                                                                <div className="flex items-center justify-between mb-1.5">
-                                                                                    <p className="text-xs font-semibold text-gray-600">{specName}{spec.required ? ' *' : ''}</p>
-                                                                                    {options.length > 0 && (
-                                                                                        <button onClick={() => setSpecModes(p => ({ ...p, [specName]: currentMode === 'select' ? 'type' : 'select' }))} className="text-xs text-violet-600 font-semibold">
-                                                                                            {currentMode === 'select' ? '+ Custom' : '☰ List'}
+                                                                                {/* Pricing Breakdown */}
+                                                                                {!catalogInfo.isBulkOnly && (
+                                                                                    <PricingBreakdown
+                                                                                        basePrice={v.listingPrice}
+                                                                                        gstPct={catalogInfo.gstPercentage}
+                                                                                        mrp={v.mrp}
+                                                                                        isBulkOnly={catalogInfo.isBulkOnly}
+                                                                                    />
+                                                                                )}
+
+                                                                                {/* SKU */}
+                                                                                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                                                                                    <span className="text-xs text-gray-400 font-medium">SKU:</span>
+                                                                                    <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
+                                                                                        {v.skuId || 'Auto-generated on save'}
+                                                                                    </span>
+                                                                                </div>
+
+                                                                                {/* Bulk Pricing */}
+                                                                                <div className="mt-4 pt-4 border-t border-dashed border-gray-100">
+                                                                                    <div className="flex items-center justify-between mb-2.5">
+                                                                                        <div>
+                                                                                            <p className="text-sm font-semibold text-gray-700">
+                                                                                                Bulk Pricing {catalogInfo.isBulkOnly ? <span className="text-red-500">*</span> : <span className="text-gray-400 font-normal text-xs">(optional)</span>}
+                                                                                            </p>
+                                                                                            <p className="text-xs text-gray-400">Discount for large quantity orders</p>
+                                                                                        </div>
+                                                                                        <button
+                                                                                            onClick={() => updateVariant(pIdx, vIdx, va => { va.priceTiers.push({ minQty: '', price: '' }); })}
+                                                                                            className="flex items-center gap-1 text-xs font-semibold text-violet-600 bg-violet-50 px-3 py-1.5 rounded-lg hover:bg-violet-100 transition-colors"
+                                                                                        >
+                                                                                            <Plus size={12} /> Add Tier
+                                                                                        </button>
+                                                                                    </div>
+
+                                                                                    {v.priceTiers?.length > 0 ? (
+                                                                                        <div className="space-y-2">
+                                                                                            {v.priceTiers.map((tier, tIdx) => (
+                                                                                                <div key={tIdx} className="flex flex-wrap items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl p-3">
+                                                                                                    <div className="flex items-center gap-1.5 flex-1 min-w-[180px]">
+                                                                                                        <span className="text-xs text-gray-500 font-medium whitespace-nowrap">Min Qty</span>
+                                                                                                        <input
+                                                                                                            type="number"
+                                                                                                            placeholder="10"
+                                                                                                            value={tier.minQty}
+                                                                                                            onChange={e => updateVariant(pIdx, vIdx, va => { va.priceTiers[tIdx].minQty = e.target.value; })}
+                                                                                                            className="w-14 border border-gray-200 rounded-lg p-1.5 text-center text-sm font-semibold bg-white outline-none"
+                                                                                                        />
+                                                                                                        <span className="text-xs text-gray-500 font-medium">Price ₹</span>
+                                                                                                        <input
+                                                                                                            type="number"
+                                                                                                            placeholder="390"
+                                                                                                            value={tier.price}
+                                                                                                            onChange={e => {
+                                                                                                                updateVariant(pIdx, vIdx, va => {
+                                                                                                                    va.priceTiers[tIdx].price = e.target.value;
+                                                                                                                    if (catalogInfo.isBulkOnly && tIdx === 0) va.listingPrice = e.target.value;
+                                                                                                                });
+                                                                                                            }}
+                                                                                                            className="flex-1 border border-gray-200 rounded-lg p-1.5 text-center text-sm font-semibold text-violet-700 bg-white outline-none"
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                    {tier.price && (() => {
+                                                                                                        const p2 = parseFloat(tier.price) || 0;
+                                                                                                        const g = parseFloat(catalogInfo.gstPercentage || 5);
+                                                                                                        const payout = (p2 * (1 + g / 100)).toFixed(2);
+                                                                                                        return (
+                                                                                                            <div className="text-right shrink-0">
+                                                                                                                <p className="text-[10px] text-amber-600 font-semibold">+{g}% GST</p>
+                                                                                                                <p className="text-[10px] text-emerald-700 font-bold">₹{payout} payout</p>
+                                                                                                            </div>
+                                                                                                        );
+                                                                                                    })()}
+                                                                                                    <button
+                                                                                                        onClick={() => updateVariant(pIdx, vIdx, va => { va.priceTiers.splice(tIdx, 1); })}
+                                                                                                        className="text-gray-300 hover:text-red-400 p-1 transition-colors"
+                                                                                                    >
+                                                                                                        <X size={14} />
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                            ))}
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        <p className="text-xs text-gray-400 italic">No bulk tiers added yet.</p>
+                                                                                    )}
+                                                                                </div>
+
+                                                                                {/* Stock */}
+                                                                                <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <span className="text-sm font-semibold text-gray-700">Stock:</span>
+                                                                                        <input
+                                                                                            type="number"
+                                                                                            placeholder="0"
+                                                                                            value={v.stock}
+                                                                                            onChange={e => updateVariant(pIdx, vIdx, va => { va.stock = e.target.value; })}
+                                                                                            className={`w-20 border-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-center outline-none transition-all ${errors[`stock_${key}`] ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50 focus:border-violet-500 focus:bg-white'}`}
+                                                                                        />
+                                                                                        <span className="text-xs text-gray-400">units</span>
+                                                                                    </div>
+                                                                                    {prod.variants.length > 1 && (
+                                                                                        <button onClick={() => updateProduct(pIdx, p => { p.variants.splice(vIdx, 1); })} className="ml-auto text-red-400 hover:text-red-600 transition-colors">
+                                                                                            <Trash2 size={15} />
                                                                                         </button>
                                                                                     )}
                                                                                 </div>
-                                                                                {currentMode === 'select' ? (
-                                                                                    <select
-                                                                                        value={prod.highlights[specName] || ''}
-                                                                                        onChange={e => updateProduct(pIdx, p => { p.highlights[specName] = e.target.value; })}
-                                                                                        className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-800 bg-white outline-none focus:border-violet-500"
-                                                                                    >
-                                                                                        <option value="">Select…</option>
-                                                                                        {options.map((o, oi) => <option key={oi} value={o}>{o}</option>)}
-                                                                                    </select>
-                                                                                ) : (
-                                                                                    <input
-                                                                                        placeholder={`Enter ${specName}…`}
-                                                                                        value={prod.highlights[specName] || ''}
-                                                                                        onChange={e => updateProduct(pIdx, p => { p.highlights[specName] = e.target.value; })}
-                                                                                        className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-800 bg-white outline-none focus:border-violet-500"
-                                                                                    />
-                                                                                )}
                                                                             </div>
                                                                         );
                                                                     })}
                                                                 </div>
                                                             </div>
-                                                        )}
 
-                                                        {/* Description */}
-                                                        <div>
-                                                            <div className="flex items-center justify-between mb-1.5">
-                                                                <Label>Product Description</Label>
-                                                                <button
-                                                                    onClick={() => handleAIGenerate(pIdx)}
-                                                                    disabled={generatingAIFor === pIdx || !catalogInfo.catalogName || !catalogInfo.category}
-                                                                    className="flex items-center gap-1.5 text-xs font-semibold text-violet-600 bg-violet-50 px-3 py-1.5 rounded-full hover:bg-violet-100 transition-colors disabled:opacity-50"
-                                                                >
-                                                                    <Sparkles size={12} />
-                                                                    {generatingAIFor === pIdx ? 'Writing…' : 'AI Write'}
-                                                                </button>
+                                                            {/* Specifications */}
+                                                            {selectedSpecs.length > 0 && (
+                                                                <div>
+                                                                    <Label>Specifications</Label>
+                                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                                        {selectedSpecs.map((spec, sIdx) => {
+                                                                            const specName = typeof spec === 'object' ? spec.name : spec;
+                                                                            const options = spec.options || [];
+                                                                            const currentMode = specModes[specName] || (options.length > 0 ? 'select' : 'type');
+                                                                            return (
+                                                                                <div key={sIdx}>
+                                                                                    <div className="flex items-center justify-between mb-1.5">
+                                                                                        <p className="text-xs font-semibold text-gray-600">{specName}{spec.required ? ' *' : ''}</p>
+                                                                                        {options.length > 0 && (
+                                                                                            <button onClick={() => setSpecModes(p => ({ ...p, [specName]: currentMode === 'select' ? 'type' : 'select' }))} className="text-xs text-violet-600 font-semibold">
+                                                                                                {currentMode === 'select' ? '+ Custom' : '☰ List'}
+                                                                                            </button>
+                                                                                        )}
+                                                                                    </div>
+                                                                                    {currentMode === 'select' ? (
+                                                                                        <select
+                                                                                            value={prod.highlights[specName] || ''}
+                                                                                            onChange={e => updateProduct(pIdx, p => { p.highlights[specName] = e.target.value; })}
+                                                                                            className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-800 bg-white outline-none focus:border-violet-500"
+                                                                                        >
+                                                                                            <option value="">Select…</option>
+                                                                                            {options.map((o, oi) => <option key={oi} value={o}>{o}</option>)}
+                                                                                        </select>
+                                                                                    ) : (
+                                                                                        <input
+                                                                                            placeholder={`Enter ${specName}…`}
+                                                                                            value={prod.highlights[specName] || ''}
+                                                                                            onChange={e => updateProduct(pIdx, p => { p.highlights[specName] = e.target.value; })}
+                                                                                            className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-800 bg-white outline-none focus:border-violet-500"
+                                                                                        />
+                                                                                    )}
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Description */}
+                                                            <div>
+                                                                <div className="flex items-center justify-between mb-1.5">
+                                                                    <Label>Product Description</Label>
+                                                                    <button
+                                                                        onClick={() => handleAIGenerate(pIdx)}
+                                                                        disabled={generatingAIFor === pIdx || !catalogInfo.catalogName || !catalogInfo.category}
+                                                                        className="flex items-center gap-1.5 text-xs font-semibold text-violet-600 bg-violet-50 px-3 py-1.5 rounded-full hover:bg-violet-100 transition-colors disabled:opacity-50"
+                                                                    >
+                                                                        <Sparkles size={12} />
+                                                                        {generatingAIFor === pIdx ? 'Writing…' : 'AI Write'}
+                                                                    </button>
+                                                                </div>
+                                                                <textarea
+                                                                    placeholder="Describe fabric, occasion, wash care… or use AI Write to auto-generate."
+                                                                    rows={4}
+                                                                    value={prod.description || ''}
+                                                                    onChange={e => updateProduct(pIdx, p => { p.description = e.target.value; })}
+                                                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-violet-500 resize-none leading-relaxed"
+                                                                />
                                                             </div>
-                                                            <textarea
-                                                                placeholder="Describe fabric, occasion, wash care… or use AI Write to auto-generate."
-                                                                rows={4}
-                                                                value={prod.description || ''}
-                                                                onChange={e => updateProduct(pIdx, p => { p.description = e.target.value; })}
-                                                                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 bg-white outline-none focus:border-violet-500 resize-none leading-relaxed"
-                                                            />
                                                         </div>
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-                                );
-                            })}
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+                                    );
+                                })}
+                            </div>
 
                             {/* Add Variant */}
-                            <div className="px-3 pb-2">
+                            <div>
                                 <button
                                     onClick={addProductVariant}
                                     className="w-full border-2 border-dashed border-violet-200 rounded-2xl py-4 flex items-center justify-center gap-2 hover:bg-violet-50 transition-all"
@@ -1062,30 +1109,33 @@ const SupplierCatalogUpload = () => {
                         </motion.div>
                     )}
                 </AnimatePresence>
+                </div>
             </div>
 
-            {/* ── FOOTER CTA ── */}
-            <div className="fixed lg:static bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 z-50 max-w-md lg:!max-w-[1000px] mx-auto shadow-lg lg:p-0 lg:bg-transparent lg:border-0 lg:shadow-none lg:mt-6 lg:mb-12 lg:z-auto">
-                <button
-                    onClick={() => {
-                        if (!validateStep()) return;
-                        if (step < 2) return setStep(s => s + 1);
-                        if (isEditMode) return setShowConfirmModal(true);
-                        handleSubmit();
-                    }}
-                    disabled={!!submitLoading}
-                    className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-60 py-3.5 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-violet-100 transition-all"
-                >
-                    {submitLoading
-                        ? 'Submitting…'
-                        : step === 2
-                            ? (isEditMode ? 'Re-submit for Review' : '🚀 Go Live Now')
-                            : 'Save & Continue'}
-                    {!submitLoading && step < 2 && <ArrowRight size={16} />}
-                </button>
+            {/* ── FOOTER CTA (Responsive) ── */}
+            <div className="p-4 bg-white border-t border-gray-100 shadow-[0_-4px_12px_rgba(0,0,0,0.03)] shrink-0 w-full z-10">
+                <div className="max-w-7xl mx-auto">
+                    <button
+                        onClick={() => {
+                            if (!validateStep()) return;
+                            if (step < 2) return setStep(s => s + 1);
+                            if (isEditMode) return setShowConfirmModal(true);
+                            handleSubmit();
+                        }}
+                        disabled={!!submitLoading}
+                        className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-60 py-3.5 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-violet-100 transition-all lg:py-3 lg:text-base"
+                    >
+                        {submitLoading
+                            ? 'Submitting…'
+                            : step === 2
+                                ? (isEditMode ? 'Re-submit for Review' : '🚀 Go Live Now')
+                                : 'Save & Continue'}
+                        {!submitLoading && step < 2 && <ArrowRight size={16} />}
+                    </button>
+                </div>
             </div>
 
-            {/* ── CATEGORY MODAL ── */}
+            {/* ── CATEGORY MODAL (Responsive) ── */}
             <AnimatePresence>
                 {showCatModal && (
                     <motion.div
@@ -1093,7 +1143,7 @@ const SupplierCatalogUpload = () => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setShowCatModal(false)}
-                        className="fixed inset-0 z-[100] flex items-end lg:items-center justify-center bg-black/50 backdrop-blur-sm"
+                        className="fixed lg:absolute inset-0 z-[100] flex items-end lg:items-center justify-center bg-black/50 backdrop-blur-sm"
                     >
                         <motion.div
                             initial={{ y: '100%', opacity: 0 }}
@@ -1101,7 +1151,7 @@ const SupplierCatalogUpload = () => {
                             exit={{ y: '100%', opacity: 0 }}
                             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
                             onClick={e => e.stopPropagation()}
-                            className="bg-white rounded-t-3xl lg:rounded-3xl max-h-[85vh] lg:max-h-[75vh] flex flex-col w-full max-w-md lg:!max-w-[600px] shadow-2xl overflow-hidden"
+                            className="bg-white rounded-t-3xl lg:rounded-3xl max-h-[85vh] lg:max-h-[75vh] flex flex-col w-full max-w-md lg:max-w-2xl shadow-2xl overflow-hidden"
                         >
                             <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto my-3 lg:hidden" />
 
@@ -1149,22 +1199,26 @@ const SupplierCatalogUpload = () => {
                                     <div className="flex justify-center py-10"><div className="w-8 h-8 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin" /></div>
                                 ) : filteredCats.length === 0 ? (
                                     <div className="py-10 text-center text-gray-400 text-sm">No categories found</div>
-                                ) : filteredCats.map(cat => (
-                                    <button
-                                        key={cat._id}
-                                        onClick={() => handleCategorySelect(cat)}
-                                        className="w-full flex items-center gap-4 bg-white border-2 border-gray-100 hover:border-violet-200 hover:bg-violet-50/30 rounded-2xl p-3 transition-all text-left group"
-                                    >
-                                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 shrink-0">
-                                            <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-semibold text-gray-800">{cat.name}</p>
-                                            <p className="text-xs text-gray-400">{cat.subCount > 0 ? `${cat.subCount} sub-categories` : 'Tap to select'}</p>
-                                        </div>
-                                        {cat.subCount > 0 ? <ChevronRight size={16} className="text-violet-500 shrink-0" /> : <Check size={16} className="text-emerald-500 shrink-0" />}
-                                    </button>
-                                ))}
+                                ) : (
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                                        {filteredCats.map(cat => (
+                                            <button
+                                                key={cat._id}
+                                                onClick={() => handleCategorySelect(cat)}
+                                                className="w-full flex items-center gap-4 bg-white border-2 border-gray-100 hover:border-violet-200 hover:bg-violet-50/30 rounded-2xl p-3 transition-all text-left group"
+                                            >
+                                                <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                                                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-semibold text-gray-800">{cat.name}</p>
+                                                    <p className="text-xs text-gray-400">{cat.subCount > 0 ? `${cat.subCount} sub-categories` : 'Tap to select'}</p>
+                                                </div>
+                                                {cat.subCount > 0 ? <ChevronRight size={16} className="text-violet-500 shrink-0" /> : <Check size={16} className="text-emerald-500 shrink-0" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </motion.div>
                     </motion.div>
@@ -1174,8 +1228,8 @@ const SupplierCatalogUpload = () => {
             {/* ── EDIT CONFIRM MODAL ── */}
             <AnimatePresence>
                 {showConfirmModal && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] flex items-end lg:items-center justify-center bg-black/40 backdrop-blur-sm">
-                        <motion.div initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} className="bg-white rounded-t-3xl lg:rounded-3xl w-full max-w-md lg:!max-w-[500px] p-6 shadow-2xl">
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed lg:absolute inset-0 z-[200] flex items-end lg:items-center justify-center bg-black/40 backdrop-blur-sm">
+                        <motion.div initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} className="bg-white rounded-t-3xl lg:rounded-3xl w-full max-w-md lg:max-w-lg p-6 shadow-2xl">
                             <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <AlertCircle size={22} className="text-amber-600" />
                             </div>
@@ -1195,7 +1249,7 @@ const SupplierCatalogUpload = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </>
+        </div>
     );
 };
 

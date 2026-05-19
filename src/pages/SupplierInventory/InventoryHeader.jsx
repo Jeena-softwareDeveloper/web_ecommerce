@@ -35,7 +35,13 @@ const InventoryHeader = ({
                 <div className="px-5 pt-4 pb-2 bg-transparent flex items-center justify-between z-30 shrink-0">
                     <div className="flex items-center">
                         <button 
-                            onClick={() => navigate(-1)}
+                            onClick={() => {
+                                if (window.history.state && window.history.state.idx > 0) {
+                                    navigate(-1);
+                                } else {
+                                    navigate('/supplier-dashboard');
+                                }
+                            }}
                             className="bg-purple-600 flex items-center px-3 py-1.5 rounded-lg mr-3 shadow-sm active:scale-95 transition-all"
                         >
                             <ArrowLeft size={16} className="text-white" />

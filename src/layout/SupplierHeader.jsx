@@ -1,17 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { 
   Bell,
   Scan,
   Upload,
-  Wallet
+  Wallet,
+  Package,
+  Layers
 } from 'lucide-react';
 
 const SupplierHeader = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   
+  const [catalogUploadStep, setCatalogUploadStep] = useState(1);
+
+  useEffect(() => {
+    const handleStepChanged = (e) => {
+      if (e.detail) {
+        setCatalogUploadStep(e.detail);
+      }
+    };
+    window.addEventListener('catalog-upload-step-changed', handleStepChanged);
+    return () => {
+      window.removeEventListener('catalog-upload-step-changed', handleStepChanged);
+    };
+  }, []);
+
   // Get supplier details from Redux vendor state
   const { supplierData, financialDashboard } = useSelector(state => state.vendor || {});
 
@@ -38,14 +54,46 @@ const SupplierHeader = () => {
     if (pathname === '/supplier-price-recommendation') return 'AI Price Recommendations';
     if (pathname === '/supplier-quality-dashboard') return 'Quality & Feedback Dashboard';
     if (pathname === '/supplier-stock') return 'AI Stock Velocity';
+    if (pathname === '/catalog-upload') return 'Catalog Upload';
     return 'Supplier Portal';
   };
 
   return (
     <div className="hidden lg:flex items-center justify-between bg-white px-8 py-3 border-b border-gray-200 sticky top-0 z-30 shrink-0">
-      <div>
-        <h2 className="text-xl font-black text-gray-900">{getHeaderTitle()}</h2>
-        <p className="text-xs text-gray-400 font-medium">Jeenora supplier platform operations dashboard</p>
+      <div className="flex items-center gap-6">
+        <div>
+          <h2 className="text-xl font-black text-gray-900">{getHeaderTitle()}</h2>
+          <p className="text-xs text-gray-400 font-medium">Jeenora supplier platform operations dashboard</p>
+        </div>
+
+        {/* Stepper Inline for Catalog Upload */}
+        {pathname === '/catalog-upload' && (
+          <div className="hidden lg:flex items-center gap-1 bg-gray-50 border border-gray-200/60 rounded-xl p-1 shrink-0 ml-2">
+            {[
+              { id: 1, label: 'Catalog Info', icon: <Package size={14} /> },
+              { id: 2, label: 'Add Products', icon: <Layers size={14} /> },
+            ].map(s => (
+              <button
+                key={s.id}
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('request-catalog-upload-step-change', { detail: s.id }));
+                }}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  catalogUploadStep === s.id
+                    ? 'bg-white text-violet-700 shadow-sm border border-gray-100'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                  catalogUploadStep === s.id ? 'bg-violet-100 text-violet-700' : 'bg-transparent text-current'
+                }`}>
+                  {s.icon}
+                </div>
+                <span>{s.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-4">
         {pathname === '/supplier-dashboard' && (

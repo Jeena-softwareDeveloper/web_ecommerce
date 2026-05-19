@@ -29,7 +29,7 @@ const DeleteConfirmModal = ({
                     initial={{ opacity: 0 }} 
                     animate={{ opacity: 1 }} 
                     exit={{ opacity: 0 }} 
-                    className="fixed inset-0 bg-black/60 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4"
+                    className="fixed lg:absolute inset-0 bg-black/60 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4"
                     onClick={onClose}>
                     <motion.div 
                         initial={isMobile ? { y: "100%" } : { scale: 0.95, opacity: 0, y: 10 }} 
