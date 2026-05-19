@@ -5,8 +5,6 @@ import { Star, ShoppingCart } from 'lucide-react';
 import { add_to_cart, get_cart } from '../../store/reducers/wearCartReducer';
 import { toast } from "sonner";
 
-import { cleanProductName, getHexColor, DEFAULT_DISPLAY_COLORS } from '../../utils/productUtils';
-
 const ProductCard = ({ product }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -16,33 +14,13 @@ const ProductCard = ({ product }) => {
     const rating = product.avgRating || product.rating || 0;
     const ratingCount = product.reviewCount || 0;
 
-    const getVariantColors = (variants = []) => {
-        const seen = new Set();
-        return variants
-            .map(v => v.variantName || v.colorName || v.colorHex || null)
-            .filter(c => c && !seen.has(c) && seen.add(c));
-    };
-
     const price = product.price || product.variants?.[0]?.listingPrice || 0;
     const mrp = product.mrp || product.variants?.[0]?.mrp || price + 100;
     const isBulk = product.isBulkOnly;
     const discount = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
-    const name = cleanProductName(product.name || product.productName);
+    const name = product.name || product.productName || "Premium Product";
     const rawImageUrl = product.images?.[0] || product.image;
     const imageUrl = (rawImageUrl && !rawImageUrl.startsWith('file://')) ? rawImageUrl : '';
-
-    // Variant Name dots: use allColors from backend grouping, or extract from variants as fallback
-    let variantColors = product.allColors?.length > 0
-        ? product.allColors
-        : getVariantColors(product.variants || []);
-    
-    // If NO colors found, use premium defaults for better UI
-    if (variantColors.length === 0) {
-        variantColors = DEFAULT_DISPLAY_COLORS;
-    }
-
-    const visibleColors = variantColors.slice(0, 4);
-    const extraCount = variantColors.length - visibleColors.length;
 
     const handleClick = () => {
         const fromPath = location.state?.from || location.pathname;
@@ -106,23 +84,16 @@ const ProductCard = ({ product }) => {
                     {name}
                 </h3>
 
-                {/* Variant Name Variant Dots & Stock Status */}
+                {/* Variant Info & Stock Status */}
                 <div className="flex items-center justify-between mb-2.5">
-                    {visibleColors.length > 0 ? (
-                        <div className="flex items-center gap-2">
-                            {visibleColors.map((color, i) => (
-                                <div
-                                    key={i}
-                                    title={color}
-                                    className="w-4 h-4 md:w-[18px] md:h-[18px] rounded-full ring-2 ring-gray-200 ring-offset-1 flex-shrink-0 transition-all duration-200 hover:scale-110 hover:ring-[#e11955]/40"
-                                    style={{ backgroundColor: getHexColor(color) }}
-                                />
-                            ))}
-                            {extraCount > 0 && (
-                                <span className="text-[10px] text-gray-500 font-bold bg-gray-100 px-1.5 py-0.5 rounded-full">+{extraCount}</span>
-                            )}
-                        </div>
-                    ) : <div />}
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] md:text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                            Variants:
+                        </span>
+                        <span className="text-[10.5px] md:text-[11.5px] font-black text-[#7C3AED] bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100/50 shadow-sm">
+                            {product.variants?.length || 1}
+                        </span>
+                    </div>
 
                     {(() => {
                         const totalStock = product.variants?.reduce((sum, v) => {

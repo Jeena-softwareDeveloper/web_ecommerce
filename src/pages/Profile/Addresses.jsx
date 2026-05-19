@@ -5,6 +5,7 @@ import { MapPin, Plus, Trash2, Home, Briefcase, X, Check } from 'lucide-react';
 import CommonHeader from '../../components/layout/CommonHeader';
 import { get_addresses, delete_address, add_address, update_address, clear_message } from '../../store/reducers/addressReducer';
 import { toast } from "sonner";
+import api from '../../api/apiClient';
 
 const Addresses = ({ desktopEmbedded = false }) => {
     const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const Addresses = ({ desktopEmbedded = false }) => {
     const [showAddForm, setShowAddForm] = useState(false);
     const [editAddressId, setEditAddressId] = useState(null);
     const [isPincodeLoading, setIsPincodeLoading] = useState(false);
+    const [pincodeError, setPincodeError] = useState(null);
     const [formData, setFormData] = useState({
         name: profileInfo?.name || userInfo?.name || '',
         phone: profileInfo?.phone || userInfo?.phone || '',
@@ -30,29 +32,46 @@ const Addresses = ({ desktopEmbedded = false }) => {
         dispatch(get_addresses());
     }, [dispatch]);
 
-    // Smart Pincode Logic from Checkout
+    // Smart Pincode Logic from Checkout with Serviceability check
     useEffect(() => {
         const fetchLocation = async () => {
             if (formData.pincode?.length === 6) {
                 setIsPincodeLoading(true);
+                setPincodeError(null);
                 try {
-                    const res = await fetch(`https://api.postalpincode.in/pincode/${formData.pincode}`);
-                    const data = await res.json();
-                    if (data[0]?.Status === "Success") {
-                        const postOffice = data[0].PostOffice[0];
+                    const res = await api.post('/wear/supplier/verify-pincode', { pincode: formData.pincode }, { skipToast: true });
+                    if (res.data?.success) {
+                        const { city, state } = res.data.data;
                         setFormData(prev => ({
                             ...prev,
-                            city: postOffice.District,
-                            state: postOffice.State,
-                            area: prev.area || postOffice.Name
+                            city: city,
+                            state: state
                         }));
-                        toast.success(`Location identified: ${postOffice.District}`);
+
+                        // Fetch from backend to check serviceability
+                        try {
+                            const serviceRes = await api.get(`/wear/orders/order/shipping-rate/${formData.pincode}?weight=0.5&cod=0`, { skipToast: true });
+                            if (serviceRes.data?.success) {
+                                toast.success("Pincode verified & serviceable!");
+                            }
+                        } catch (err) {
+                            const errMsg = err.response?.data?.error || "Courier not serviceable for this pincode";
+                            setPincodeError(errMsg);
+                            toast.error(errMsg);
+                        }
+                    } else {
+                        setPincodeError("Invalid Pincode");
+                        toast.error("Invalid Pincode");
                     }
                 } catch (err) {
-                    console.error("Pincode fetch error:", err);
+                    const errMsg = err.response?.data?.error || "Invalid Pincode";
+                    setPincodeError(errMsg);
+                    toast.error(errMsg);
                 } finally {
                     setIsPincodeLoading(false);
                 }
+            } else {
+                setPincodeError(null);
             }
         };
         fetchLocation();
@@ -73,6 +92,7 @@ const Addresses = ({ desktopEmbedded = false }) => {
     const closeModal = () => {
         setShowAddForm(false);
         setEditAddressId(null);
+        setPincodeError(null);
         setFormData({
             name: profileInfo?.name || userInfo?.name || '',
             phone: profileInfo?.phone || userInfo?.phone || '',
@@ -101,11 +121,16 @@ const Addresses = ({ desktopEmbedded = false }) => {
             houseNo: addr.houseNo,
             type: addr.type
         });
+        setPincodeError(null);
         setShowAddForm(true);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (pincodeError) {
+            toast.error(pincodeError);
+            return;
+        }
         if (editAddressId) {
             dispatch(update_address({ id: editAddressId, info: formData }));
         } else {
@@ -152,9 +177,14 @@ const Addresses = ({ desktopEmbedded = false }) => {
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">6-Digit Pincode</label>
                                     <div className="relative">
-                                        <input name="pincode" required value={formData.pincode} onChange={handleInput} type="tel" maxLength={6} className="w-full bg-rose-50/20 border border-red-100 rounded-xl p-4 font-bold text-gray-800 outline-none focus:border-blue-500 transition-colors" placeholder="6-Digit Pincode" />
+                                        <input name="pincode" required value={formData.pincode} onChange={handleInput} type="tel" maxLength={6} className={`w-full bg-rose-50/20 border rounded-xl p-4 font-bold text-gray-800 outline-none focus:border-blue-500 transition-colors ${pincodeError ? 'border-red-500' : 'border-red-100'}`} placeholder="6-Digit Pincode" />
                                         {isPincodeLoading && <div className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />}
                                     </div>
+                                    {pincodeError && (
+                                        <p className="text-[10px] text-red-500 font-bold mt-1 uppercase tracking-widest flex items-center gap-1">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block animate-pulse" /> {pincodeError}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-1.5">
@@ -196,11 +226,20 @@ const Addresses = ({ desktopEmbedded = false }) => {
 
                             <div className="p-6 border-t border-gray-100 bg-white">
                                 <button 
-                                    className="w-full bg-primary py-4 rounded-2xl text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-rose-100 flex items-center justify-center gap-3 active:scale-95 transition-all cursor-pointer"
+                                    className={`w-full py-4 rounded-2xl text-white font-black text-xs uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all cursor-pointer ${(loader || !!pincodeError || isPincodeLoading) ? 'bg-gray-300 cursor-not-allowed shadow-none' : 'bg-primary shadow-rose-100'}`}
                                     type="submit"
-                                    disabled={loader}
+                                    disabled={loader || !!pincodeError || isPincodeLoading}
                                 >
-                                    {loader ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>{editAddressId ? 'Update Address' : 'Save Address'} <Check size={16} /></>}
+                                    {loader ? (
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : isPincodeLoading ? (
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            <span>Verifying...</span>
+                                        </div>
+                                    ) : (
+                                        <>{editAddressId ? 'Update Address' : 'Save Address'} <Check size={16} /></>
+                                    )}
                                 </button>
                             </div>
                         </form>

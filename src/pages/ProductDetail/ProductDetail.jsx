@@ -25,7 +25,6 @@ import {
 import { get_reviews } from '../../store/reducers/reviewReducer';
 import { add_to_cart, get_cart } from '../../store/reducers/wearCartReducer';
 import { get_active_offers, get_global_offers } from '../../store/reducers/vendorOfferReducer';
-import { cleanProductName } from '../../utils/productUtils';
 
 
 // --- HELPERS ---

@@ -67,6 +67,7 @@ const Checkout = () => {
     });
 
     const [isPincodeLoading, setIsPincodeLoading] = useState(false);
+    const [pincodeError, setPincodeError] = useState(null);
     const [dynamicShipping, setDynamicShipping] = useState(null);
     const [rtoRisk, setRtoRisk] = useState(0);
     const [isRtoChecking, setIsRtoChecking] = useState(false);
@@ -76,6 +77,7 @@ const Checkout = () => {
     const closeAddressModal = useCallback(() => {
         setShowAddressModal(false);
         setEditAddressId(null);
+        setPincodeError(null);
         setNewAddress({
             name: userInfo?.name || '',
             phone: userInfo?.phone || '',
@@ -112,28 +114,46 @@ const Checkout = () => {
         }
     }, [selectedAddress, paymentMethod]);
 
-    // Auto-fetch City/State from Pincode
+    // Auto-fetch City/State and Check Serviceability from Pincode
     useEffect(() => {
         const fetchLocation = async () => {
             if (newAddress.pincode?.length === 6) {
                 setIsPincodeLoading(true);
+                setPincodeError(null);
                 try {
-                    const res = await fetch(`https://api.postalpincode.in/pincode/${newAddress.pincode}`);
-                    const data = await res.json();
-                    if (data[0]?.Status === "Success") {
-                        const postOffice = data[0].PostOffice[0];
+                    const res = await api.post('/wear/supplier/verify-pincode', { pincode: newAddress.pincode }, { skipToast: true });
+                    if (res.data?.success) {
+                        const { city, state } = res.data.data;
                         setNewAddress(prev => ({
                             ...prev,
-                            city: postOffice.District,
-                            state: postOffice.State,
-                            area: prev.area || postOffice.Name
+                            city: city,
+                            state: state
                         }));
+
+                        // Fetch from backend to check serviceability
+                        try {
+                            const serviceRes = await api.get(`/wear/orders/order/shipping-rate/${newAddress.pincode}?weight=0.5&cod=0`, { skipToast: true });
+                            if (serviceRes.data?.success) {
+                                toast.success("Pincode verified & serviceable!");
+                            }
+                        } catch (err) {
+                            const errMsg = err.response?.data?.error || "Courier not serviceable for this pincode";
+                            setPincodeError(errMsg);
+                            toast.error(errMsg);
+                        }
+                    } else {
+                        setPincodeError("Invalid Pincode");
+                        toast.error("Invalid Pincode");
                     }
                 } catch (err) {
-                    console.error("Pincode fetch error:", err);
+                    const errMsg = err.response?.data?.error || "Invalid Pincode";
+                    setPincodeError(errMsg);
+                    toast.error(errMsg);
                 } finally {
                     setIsPincodeLoading(false);
                 }
+            } else {
+                setPincodeError(null);
             }
         };
         fetchLocation();
@@ -344,6 +364,10 @@ const Checkout = () => {
 
     const handleAddAddress = (e) => {
         e.preventDefault();
+        if (pincodeError) {
+            toast.error(pincodeError);
+            return;
+        }
         if (editAddressId) {
             dispatch(update_address({ id: editAddressId, info: newAddress }));
         } else {
@@ -363,6 +387,7 @@ const Checkout = () => {
             type: addr.type
         });
         setEditAddressId(addr._id);
+        setPincodeError(null);
         setShowAddressModal(true);
     };
 
@@ -387,23 +412,17 @@ const Checkout = () => {
             <div className="bg-white py-6 border-b border-gray-100 relative z-20">
                 <div className="max-w-md mx-auto px-6">
                     <div className="flex items-center justify-between relative">
-                        {/* THE BACKGROUND LINE */}
-                        <div className="absolute top-[16px] left-4 right-4 h-[2px] bg-gray-100 z-0" />
-
-                        {/* THE ANIMATED PROGRESS LINE */}
-                        <motion.div
-                            initial={{ width: '0%' }}
-                            animate={{
-                                width: step === 1 ? '50%' : '100%',
-                                transition: { duration: 0.8, ease: "circOut" }
-                            }}
-                            className="absolute top-[16px] left-0 h-[2.5px] bg-gradient-to-r from-emerald-500 via-[#e11955] to-[#e11955] z-0 origin-left"
-                            style={{
-                                left: '16px',
-                                width: 'calc(100% - 32px)',
-                                transformOrigin: 'left'
-                            }}
-                        />
+                        {/* THE BACKGROUND LINE & ANIMATED PROGRESS LINE */}
+                        <div className="absolute top-[16px] left-4 right-4 h-[2.5px] bg-gray-100 z-0 rounded-full overflow-hidden">
+                            <motion.div
+                                initial={false}
+                                animate={{
+                                    width: step === 1 ? '50%' : '100%'
+                                }}
+                                transition={{ duration: 0.6, ease: "easeInOut" }}
+                                className="h-full bg-gradient-to-r from-emerald-500 via-emerald-500 to-[#e11955] origin-left rounded-full"
+                            />
+                        </div>
 
                         {steps.map((s, idx) => {
                             const isCompleted = (idx === 0) || (idx === 1 && step === 2);
@@ -807,9 +826,14 @@ const Checkout = () => {
                                     <div className="space-y-1.5">
                                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Pincode</label>
                                         <div className="relative">
-                                            <input required value={newAddress.pincode} onChange={e => setNewAddress({ ...newAddress, pincode: e.target.value })} type="tel" maxLength={6} className="w-full bg-rose-50/10 border border-rose-100 rounded-lg p-4 font-medium text-gray-800 outline-none focus:border-rose-300 transition-colors" placeholder="6-Digit Pincode" />
+                                            <input required value={newAddress.pincode} onChange={e => setNewAddress({ ...newAddress, pincode: e.target.value })} type="tel" maxLength={6} className={`w-full bg-rose-50/10 border rounded-lg p-4 font-medium text-gray-800 outline-none focus:border-rose-300 transition-colors ${pincodeError ? 'border-red-500' : 'border-rose-100'}`} placeholder="6-Digit Pincode" />
                                             {isPincodeLoading && <div className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />}
                                         </div>
+                                        {pincodeError && (
+                                            <p className="text-[10px] text-red-500 font-bold mt-1 uppercase tracking-widest flex items-center gap-1">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block animate-pulse" /> {pincodeError}
+                                            </p>
+                                        )}
                                     </div>
 
                                     <div className="space-y-1.5">
@@ -852,11 +876,20 @@ const Checkout = () => {
                                 {/* FIXED FOOTER SECTION */}
                                 <div className="p-6 border-t border-gray-50 bg-white">
                                     <button
-                                        className="w-full bg-[#e11955] py-5 rounded-lg text-white font-semibold text-xs uppercase tracking-widest shadow-xl shadow-rose-100 flex items-center justify-center gap-3 active:scale-95 transition-all"
+                                        className={`w-full py-5 rounded-lg text-white font-semibold text-xs uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all ${(addressLoading || !!pincodeError || isPincodeLoading) ? 'bg-gray-300 cursor-not-allowed shadow-none' : 'bg-[#e11955] shadow-rose-100 hover:opacity-90'}`}
                                         type="submit"
-                                        disabled={addressLoading}
+                                        disabled={addressLoading || !!pincodeError || isPincodeLoading}
                                     >
-                                        {addressLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>{editAddressId ? 'Update Address' : 'Save & Continue'} <Check size={16} /></>}
+                                        {addressLoading ? (
+                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        ) : isPincodeLoading ? (
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                <span>Verifying...</span>
+                                            </div>
+                                        ) : (
+                                            <>{editAddressId ? 'Update Address' : 'Save & Continue'} <Check size={16} /></>
+                                        )}
                                     </button>
                                 </div>
                             </form>
