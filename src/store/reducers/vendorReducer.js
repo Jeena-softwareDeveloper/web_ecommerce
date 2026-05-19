@@ -545,7 +545,7 @@ const vendorSlice = createSlice({
         });
         builder.addCase(get_financial_dashboard.fulfilled, (state, { payload }) => {
             state.loader = false;
-            state.financialDashboard = payload.data || payload;
+            state.financialDashboard = payload.dashboard || payload.data || payload;
         });
         builder.addCase(get_financial_dashboard.rejected, (state, { payload }) => {
             state.loader = false;
