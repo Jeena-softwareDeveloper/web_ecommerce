@@ -511,6 +511,7 @@ const vendorSlice = createSlice({
             state.recentOrders = payload.recentOrders || [];
             state.recentMessages = payload.recentMessages || [];
             state.supplierData = {
+                _id: payload._id,
                 status: payload.status,
                 shopName: payload.shopName
             };
