@@ -60,7 +60,7 @@ const ProductDetail = () => {
     const isDemo = new URLSearchParams(location.search).get('demo') === 'true';
 
     const {
-        productDetails: product,
+        productDetails: rawProduct,
         loader: loading,
         relatedProducts: relatedProductsFromStore,
         similarProducts,
@@ -70,6 +70,28 @@ const ProductDetail = () => {
     const { reviews, stats: reviewStats } = useSelector(state => state.review);
     const { globalOffers: systemOffers } = useSelector(state => state.vendorOffer);
     const { profileInfo } = useSelector(state => state.profile);
+
+    const product = React.useMemo(() => {
+        if (!rawProduct) return null;
+        return {
+            ...rawProduct,
+            variants: (rawProduct.variants || []).map(v => {
+                if (v && v._doc) {
+                    return {
+                        ...v._doc,
+                        ...v,
+                        listingPrice: v.listingPrice ?? v._doc.listingPrice,
+                        mrp: v.mrp ?? v._doc.mrp,
+                        stock: v.stock ?? v._doc.stock ?? v.availableStock ?? v._doc.availableStock ?? v.totalStock ?? v._doc.totalStock ?? 0
+                    };
+                }
+                return {
+                    ...v,
+                    stock: v?.stock ?? v?.availableStock ?? v?.totalStock ?? 0
+                };
+            })
+        };
+    }, [rawProduct]);
 
     const [selectedSize, setSelectedSize] = useState('');
     const [selectedQty, setSelectedQty] = useState(1);
@@ -402,7 +424,7 @@ const ProductDetail = () => {
         const variantStock = v.stock ?? v.availableStock ?? v.totalStock ?? 0;
         return acc + variantStock;
     }, 0) || 0;
-    const currentStock = isNoSize ? totalStock : (currentVariant?.stock ?? currentVariant?.availableStock ?? currentVariant?.totalStock ?? 0);
+    const currentStock = (isNoSize || !selectedSize) ? totalStock : (currentVariant?.stock ?? currentVariant?.availableStock ?? currentVariant?.totalStock ?? 0);
     const relatedProducts = (relatedProductsFromStore || []).filter(p => p._id !== product._id);
 
     return (

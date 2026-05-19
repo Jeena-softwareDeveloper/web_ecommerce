@@ -104,6 +104,7 @@ const SupplierInventory = () => {
     const [scanInput, setScanInput] = useState('');
     const [scannedProduct, setScannedProduct] = useState(null);
     const [fetchingIds, setFetchingIds] = useState({});
+    const [selectedProductVariants, setSelectedProductVariants] = useState(null);
 
     // Mobile Expand/Collapse Logic
     const toggleExpandMobile = async (item) => {
@@ -518,7 +519,10 @@ const SupplierInventory = () => {
                                                         key={subProduct._id}
                                                         className="bg-white rounded-lg p-3 flex flex-col shadow-xs"
                                                     >
-                                                        <div className="flex items-center gap-3">
+                                                        <div 
+                                                            onClick={() => setSelectedProductVariants(subProduct)}
+                                                            className="flex items-center gap-3 cursor-pointer hover:opacity-85 active:opacity-75 transition-all"
+                                                        >
                                                             <img 
                                                                 src={subProduct.images?.[0] || ''} 
                                                                 alt="" 
@@ -547,6 +551,13 @@ const SupplierInventory = () => {
                                                         {/* Sub-product Action Buttons Row */}
                                                         <div className="flex items-center justify-between border-t border-gray-50 pt-2 mt-2 gap-2">
                                                             <div className="flex gap-2">
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); setSelectedProductVariants(subProduct); }}
+                                                                    className="w-6.5 h-6.5 flex items-center justify-center bg-blue-50 border border-blue-100 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
+                                                                    title="View Sizes & Prices"
+                                                                >
+                                                                    <Eye size={11} />
+                                                                </button>
                                                                 <button
                                                                     onClick={(e) => { e.stopPropagation(); handleOpenBarcode(subProduct); }}
                                                                     className="w-6.5 h-6.5 flex items-center justify-center bg-gray-50 border border-gray-200 text-gray-500 rounded-md"
@@ -645,7 +656,10 @@ const SupplierInventory = () => {
                                             key={subProduct._id}
                                             className="bg-white rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-200/60 shadow-sm gap-4 hover:border-purple-100 hover:bg-purple-50/5 transition-all"
                                         >
-                                            <div className="flex items-center gap-4 min-w-0">
+                                            <div 
+                                                onClick={() => setSelectedProductVariants(subProduct)}
+                                                className="flex items-center gap-4 min-w-0 cursor-pointer hover:opacity-85 transition-all"
+                                            >
                                                 <img 
                                                     src={subProduct.images?.[0] || ''} 
                                                     alt="" 
@@ -691,6 +705,13 @@ const SupplierInventory = () => {
                                                     )}
                                                 </div>
                                                 <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => setSelectedProductVariants(subProduct)}
+                                                        className="w-8 h-8 flex items-center justify-center bg-blue-50 border border-blue-100 text-blue-600 rounded-lg hover:text-blue-700 hover:border-blue-200 transition-colors"
+                                                        title="View Sizes & Prices"
+                                                    >
+                                                        <Eye size={13} />
+                                                    </button>
                                                     <button
                                                         onClick={() => handleOpenBarcode(subProduct)}
                                                         className="w-8 h-8 flex items-center justify-center bg-gray-50 border border-gray-200 text-gray-600 rounded-lg hover:text-purple-600 hover:border-purple-200 transition-colors"
@@ -870,6 +891,104 @@ const SupplierInventory = () => {
                                     </div>
                                 </div>
                             )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* SIZES, STOCK & PRICES BOTTOM SHEET MODAL */}
+            <AnimatePresence>
+                {selectedProductVariants && (
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }} 
+                        className="fixed inset-0 bg-black/60 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4"
+                        onClick={() => setSelectedProductVariants(null)}
+                    >
+                        <motion.div 
+                            initial={{ y: "100%", opacity: 0 }} 
+                            animate={{ y: 0, opacity: 1 }} 
+                            exit={{ y: "100%", opacity: 0 }} 
+                            transition={{ type: "spring", damping: 25, stiffness: 250 }}
+                            className="bg-white rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl relative w-full sm:max-w-lg border border-gray-100 max-h-[80vh] sm:max-h-[85vh] flex flex-col"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Drag Indicator for Mobile */}
+                            <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-4 sm:hidden shrink-0" />
+
+                            <button 
+                                onClick={() => setSelectedProductVariants(null)} 
+                                className="absolute top-6 right-6 p-2 bg-gray-50 border border-gray-200/50 rounded-xl text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <X size={18} />
+                            </button>
+                            
+                            <div className="flex items-start gap-4 mb-5 pr-8 shrink-0">
+                                <img 
+                                    src={selectedProductVariants.images?.[0] || ''} 
+                                    alt="" 
+                                    className="w-14 h-18 rounded-xl object-cover border border-gray-100 bg-gray-50"
+                                />
+                                <div className="min-w-0">
+                                    <h3 className="text-sm font-black text-gray-900 leading-snug">
+                                        {selectedProductVariants.productName}
+                                    </h3>
+                                    <p className="text-[10px] text-gray-400 font-extrabold uppercase mt-1">
+                                        Category: {selectedProductVariants.category} • {selectedProductVariants.subCategory}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-3 shrink-0">Size Breakdown & Stock</p>
+
+                            <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+                                {selectedProductVariants.variants?.length > 0 ? (
+                                    selectedProductVariants.variants.map((v, i) => {
+                                        const isAvailable = (v.stock || 0) > 0;
+                                        return (
+                                            <div 
+                                                key={v._id || i}
+                                                className="bg-gray-50/50 border border-gray-150 rounded-2xl p-4 flex items-center justify-between gap-4"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700 font-extrabold text-xs">
+                                                        {v.size}
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span className="text-xs font-bold text-gray-500">Stock:</span>
+                                                            <span className={`text-xs font-black ${isAvailable ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                                                {v.stock || 0}
+                                                            </span>
+                                                        </div>
+                                                        {v.skuId && (
+                                                            <p className="text-[9px] font-mono text-gray-400 mt-0.5">
+                                                                SKU: {v.skuId}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <div className="text-right">
+                                                    <div className="text-sm font-black text-gray-900">
+                                                        ₹{v.listingPrice}
+                                                    </div>
+                                                    {v.mrp > v.listingPrice && (
+                                                        <div className="text-[10px] text-gray-400 line-through">
+                                                            MRP ₹{v.mrp}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })
+                                ) : (
+                                    <div className="text-center py-6 text-xs text-gray-400 font-bold">
+                                        No variants/sizes found for this style.
+                                    </div>
+                                )}
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}
