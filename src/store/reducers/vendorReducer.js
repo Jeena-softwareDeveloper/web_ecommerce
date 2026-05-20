@@ -27,6 +27,35 @@ export const update_order_status = createAsyncThunk(
     }
 );
 
+// Step 1: Supplier confirms order → Shiprocket order created + AWB generated
+export const confirm_order = createAsyncThunk(
+    'vendor/confirm_order',
+    async ({ orderId, weight, length, width, height }, { rejectWithValue }) => {
+        try {
+            const { data } = await apiClient.post(`/wear/supplier/orders/${orderId}/confirm`, {
+                weight, length, width, height
+            });
+            return { ...data, orderId };
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+// Step 2: Supplier hands to courier → Shiprocket pickup scheduled
+export const ship_now = createAsyncThunk(
+    'vendor/ship_now',
+    async (orderId, { rejectWithValue }) => {
+        try {
+            const { data } = await apiClient.post(`/wear/supplier/orders/${orderId}/ship-now`);
+            return { ...data, orderId };
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+
 export const get_supplier_order_detail = createAsyncThunk(
     'vendor/get_supplier_order_detail',
     async (orderId, { rejectWithValue }) => {
@@ -441,6 +470,46 @@ const vendorSlice = createSlice({
             if (index !== -1) {
                 state.supplierOrders[index] = { ...state.supplierOrders[index], ...payload.order };
             }
+        });
+
+        // confirm_order: pending → confirmed + saves AWB
+        builder.addCase(confirm_order.pending, (state) => { state.loader = true; });
+        builder.addCase(confirm_order.fulfilled, (state, { payload }) => {
+            state.loader = false;
+            state.successMessage = payload.message || 'Order confirmed! AWB generated.';
+            const index = state.supplierOrders.findIndex(o => o._id === payload.orderId);
+            if (index !== -1) {
+                state.supplierOrders[index] = {
+                    ...state.supplierOrders[index],
+                    delivery_status: 'confirmed',
+                    awb_number: payload.awb_number,
+                    trackingUrl: payload.trackingUrl,
+                    shiprocket_order_id: payload.shiprocket_order_id,
+                    label_url: payload.label_url
+                };
+            }
+        });
+        builder.addCase(confirm_order.rejected, (state, { payload }) => {
+            state.loader = false;
+            state.errorMessage = payload?.error || 'Confirmation failed. Please try again.';
+        });
+
+        // ship_now: confirmed → shipped + schedules pickup
+        builder.addCase(ship_now.pending, (state) => { state.loader = true; });
+        builder.addCase(ship_now.fulfilled, (state, { payload }) => {
+            state.loader = false;
+            state.successMessage = payload.message || 'Pickup scheduled! Order shipped.';
+            const index = state.supplierOrders.findIndex(o => o._id === payload.orderId);
+            if (index !== -1) {
+                state.supplierOrders[index] = {
+                    ...state.supplierOrders[index],
+                    delivery_status: 'shipped'
+                };
+            }
+        });
+        builder.addCase(ship_now.rejected, (state, { payload }) => {
+            state.loader = false;
+            state.errorMessage = payload?.error || 'Shipping failed. Please try again.';
         });
 
         builder.addCase(get_supplier_order_detail.fulfilled, (state, { payload }) => {
